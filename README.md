@@ -3,6 +3,8 @@
 一个**单文件、零构建、零依赖**的静态 Web 应用，用于实验室多人编制的**值日轮转**与**成员职责管理**。
 直接双击 `index.html` 即可运行，也可以部署到任意静态托管（GitHub Pages / Cloudflare Pages / 内网服务器）。
 
+🔗 **在线访问**：<https://cry-aml.github.io/lab-duty-roster/>
+
 ## 功能
 
 ### 人员轮转中枢
