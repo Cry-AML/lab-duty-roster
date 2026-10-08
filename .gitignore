@@ -1,0 +1,16 @@
+# ── 本地源数据（含成员真实姓名，不进入公开仓库）──
+lab-duty-source-photo.jpg
+
+# ── 第三方参考包（非本项目产物，涉及转载合规，不入库）──
+Web-Prototype.zip
+
+# ── 历史版本备份（含成员真实姓名，不入库）──
+index-v2-前版本备份.html
+
+# ── 系统与编辑器文件 ──
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/

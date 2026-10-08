@@ -1,0 +1,2239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LabDuty · 实验室值日与协同管理平台</title>
+  <style>
+    /* ─────────────────────────────────────────────────────────────────────────
+     * Design Tokens — Apple HIG 风格设计令牌
+     * 令牌集中定义；实现层不替换为框架默认主题色/字体
+     * ───────────────────────────────────────────────────────────────────────── */
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f7;
+      --surface-warm: #fbfbfd;
+      --fg: #1d1d1f;
+      --fg-2: #424245;
+      --muted: #6e6e73;
+      --meta: #86868b;
+      --border: #d2d2d7;
+      --border-soft: #e8e8ed;
+      --accent: #0071e3;
+      --accent-on: #ffffff;
+      --accent-hover: #0077ed;
+      --accent-active: #0066cc;
+      --success: #16a34a;
+      --warn: #eab308;
+      --danger: #dc2626;
+
+      --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 17px;
+      --text-lg: 21px;
+      --text-xl: 28px;
+      --text-2xl: 40px;
+      --text-3xl: 56px;
+      --text-4xl: 80px;
+
+      --leading-body: 1.47;
+      --leading-tight: 1.05;
+      --tracking-display: -0.015em;
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 980px;
+
+      --elev-flat: none;
+      --elev-ring: 0 0 0 1px var(--border);
+      --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+
+      --motion-fast: 150ms;
+      --motion-base: 220ms;
+      --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+
+      --container-max: 1140px;
+      --container-gutter-desktop: 24px;
+      --container-gutter-tablet: 18px;
+      --container-gutter-phone: 16px;
+    }
+
+    /* ─── Base & Resets ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--surface);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: transparent; }
+    p { text-wrap: pretty; margin: 0; }
+    h1, h2, h3, h4 { text-wrap: balance; margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-display); }
+
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .meta { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--meta); }
+    .container {
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-inline: var(--container-gutter-desktop);
+    }
+    @media (max-width: 834px) {
+      .container { padding-inline: var(--container-gutter-tablet); }
+    }
+    @media (max-width: 640px) {
+      .container { padding-inline: var(--container-gutter-phone); }
+    }
+
+    /* ─── Topnav (Glassmorphic Bar) ─────────────────────────────────── */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-soft);
+      transition: background var(--motion-base) var(--ease-standard);
+    }
+    .top-bar-inner {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      padding-block: var(--space-2);
+    }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      cursor: pointer;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--fg);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-text {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 640px) {
+      .brand-text { font-size: var(--text-sm); }
+      /* 移动端收紧顶栏：隐藏环境胶囊与品牌副标题，避免顶栏换行过高 */
+      .brand-sub { display: none; }
+      .env-chip { display: none; }
+      .user-quick-pill .user-name-text {
+        max-width: 84px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    /* Top Mode Switcher (Roster vs Personal Duty) */
+    .view-segmented-control {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+    }
+    .view-seg-btn {
+      padding: 6px 18px;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      border-radius: var(--radius-pill);
+      color: var(--muted);
+      transition: all var(--motion-fast) var(--ease-standard);
+      white-space: nowrap;
+    }
+    @media (max-width: 640px) {
+      .view-seg-btn { padding: 6px 12px; font-size: var(--text-xs); }
+    }
+
+    /* 超窄屏（≤480px）使用紧凑分段标签，避免顶栏折成三行 */
+    .seg-short { display: none; }
+    @media (max-width: 480px) {
+      .seg-full { display: none; }
+      .seg-short { display: inline; }
+    }
+    .view-seg-btn.active {
+      background: var(--bg);
+      color: var(--fg);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+    }
+    .view-seg-btn:hover:not(.active) {
+      color: var(--fg);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .env-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--text-xs);
+      font-family: var(--font-mono);
+      color: var(--muted);
+      background: var(--surface);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+      white-space: nowrap;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--success), transparent 75%);
+      animation: pulse 2.5s infinite var(--ease-standard);
+      flex-shrink: 0;
+    }
+    .pulse-dot.is-prep {
+      background: var(--warn);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--warn), transparent 75%);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.92); }
+    }
+
+    /* Current User Profile Switcher in Top Bar */
+    .user-quick-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 5px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all var(--motion-fast) var(--ease-standard);
+      white-space: nowrap;
+    }
+    .user-quick-pill:hover {
+      border-color: var(--fg-2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    .user-mini-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--fg);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ─── Apple Buttons & Controls ─────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      border-radius: var(--radius-pill);
+      padding: 8px 18px;
+      line-height: 1.25;
+      transition: background var(--motion-fast) var(--ease-standard),
+                  transform var(--motion-fast) var(--ease-standard),
+                  box-shadow var(--motion-fast) var(--ease-standard),
+                  border-color var(--motion-fast) var(--ease-standard);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .btn-primary { background: var(--accent); color: var(--accent-on); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:active { background: var(--accent-active); }
+    .btn-secondary { background: var(--bg); color: var(--fg); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--surface); border-color: var(--meta); }
+    .btn-pill-compact { font-size: var(--text-xs); padding: 6px 14px; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ─── Layout & Cards ───────────────────────────────────────────── */
+    .workspace-wrap { padding-block: var(--space-6) var(--space-12); }
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: box-shadow var(--motion-base) var(--ease-standard);
+      overflow: hidden;
+    }
+    .card:hover { box-shadow: var(--elev-raised); }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: var(--space-2);
+    }
+
+    /* ─── Member Horizontal Selector Bar ────────────────────────────── */
+    .member-selector-wrap {
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-2);
+    }
+    .member-selector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-4);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .member-pills-scroll {
+      display: flex;
+      gap: var(--space-3);
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+    }
+    .member-pills-scroll::-webkit-scrollbar { height: 4px; }
+    .member-pills-scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    .member-nav-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-pill);
+      padding: 6px 16px 6px 6px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--motion-fast) var(--ease-standard);
+      flex-shrink: 0;
+    }
+    .member-nav-card:hover {
+      border-color: var(--meta);
+      transform: translateY(-1px);
+    }
+    .member-nav-card.active {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    .member-nav-card.active .member-role-sub { color: rgba(255, 255, 255, 0.7); }
+    .member-nav-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .member-nav-card.active .member-nav-avatar {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+    .member-name-main {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .member-role-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .badge-today-duty {
+      font-size: 10px;
+      background: rgba(0, 113, 227, 0.1);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .member-nav-card.active .badge-today-duty {
+      background: #ffffff;
+      color: var(--accent);
+    }
+
+    /* ─── Cycle Toolbar (周期标尺与切换) ─────────────────────────────── */
+    .cycle-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .cycle-nav-group {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .cycle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--fg);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+    }
+    .cycle-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .cycle-range {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--fg-2);
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+    }
+    .cycle-tools {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .mini-input {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--fg);
+      background: var(--surface-warm);
+      outline: none;
+      transition: border-color var(--motion-fast) var(--ease-standard);
+    }
+    .mini-input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
+
+    /* ─── VIEW 1: ROSTER 全景排班系统 ──────────────────────────────── */
+    #view-roster { display: block; animation: fadeIn 0.3s var(--ease-standard); }
+    #view-duty { display: none; animation: fadeIn 0.3s var(--ease-standard); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Billboard Roster Overview Card */
+    .roster-billboard {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 920px) {
+      .roster-billboard { grid-template-columns: 1fr; }
+    }
+    .billboard-hero-main {
+      background: var(--bg);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .billboard-title {
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: var(--space-2);
+    }
+    .billboard-desc {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      max-width: 54ch;
+      margin-bottom: var(--space-5);
+    }
+    .roster-lead-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      flex-wrap: wrap;
+    }
+    .lead-avatar-lg {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--fg);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: var(--text-base);
+      flex-shrink: 0;
+    }
+    .lead-info-wrap { flex: 1; min-width: 160px; }
+    .lead-title-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .lead-name {
+      font-weight: 600;
+      font-size: var(--text-base);
+      color: var(--fg);
+    }
+    .tag-duty-lead {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--accent-on);
+      font-weight: 500;
+    }
+
+    /* Roster Metrics & Rules Card */
+    .billboard-meta-card {
+      background: var(--surface-warm);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .roster-rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-block: var(--space-3);
+    }
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+    }
+    .rule-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    .rule-text { color: var(--fg-2); line-height: 1.4; }
+
+    /* Week vs Month Tabs */
+    .section-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .toolbar-title {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .roster-subtabs {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+    }
+    .roster-subtab-btn {
+      padding: 5px 14px;
+      font-size: var(--text-xs);
+      font-weight: 500;
+      border-radius: var(--radius-pill);
+      color: var(--muted);
+      transition: all var(--motion-fast) var(--ease-standard);
+      white-space: nowrap;
+    }
+    .roster-subtab-btn.active {
+      background: var(--bg);
+      color: var(--fg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+    }
+
+    /* Slot Cards Grid (本周期岗位视图) */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 1100px) { .slot-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 834px)  { .slot-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .slot-grid { grid-template-columns: 1fr; } }
+
+    .slot-card {
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 210px;
+      transition: all var(--motion-fast) var(--ease-standard);
+      position: relative;
+    }
+    .slot-card:hover {
+      border-color: var(--meta);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+    }
+    .slot-card.is-daily { border-color: color-mix(in oklab, var(--warn), transparent 55%); }
+    .slot-card.is-current-focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 24px rgba(0, 113, 227, 0.08);
+    }
+    .day-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-2);
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .day-name {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--fg);
+    }
+    /* Frequency chips (token-mapped) */
+    .freq-chip {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .freq-daily    { background: rgba(234, 179, 8, 0.16); color: #96690a; }
+    .freq-weekly   { background: rgba(0, 113, 227, 0.1);  color: var(--accent); }
+    .freq-biweekly { background: var(--surface); color: var(--fg-2); border: 1px solid var(--border-soft); }
+
+    /* Person Slot */
+    .shift-person-slot {
+      margin-bottom: var(--space-2);
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .shift-person-slot:hover { background: var(--border-soft); }
+    .shift-person-role {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .shift-person-name {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .shift-person-name svg {
+      opacity: 0;
+      transition: opacity var(--motion-fast) var(--ease-standard);
+      flex-shrink: 0;
+    }
+    .shift-person-slot:hover .shift-person-name svg { opacity: 1; }
+    .shift-scope-tag {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      background: var(--surface-warm);
+      color: var(--fg-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+    .slot-duty-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--fg);
+      line-height: 1.35;
+    }
+    .slot-desc {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: var(--space-2);
+    }
+
+    /* Table View (轮换总览大表) */
+    .month-roster-view {
+      display: none;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-6);
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .month-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+      min-width: 860px;
+    }
+    .month-table th {
+      background: var(--surface);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      font-size: var(--text-xs);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+    .month-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-soft);
+      vertical-align: middle;
+    }
+    .month-table tr:hover td { background: var(--surface-warm); }
+    .month-table tr.is-current td { background: rgba(0, 113, 227, 0.04); }
+    .link-jump-duty {
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 500;
+      background: none;
+      padding: 0;
+    }
+    .link-jump-duty:hover { text-decoration: underline; }
+
+    /* Roster Support: 执行规约栅格 */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-3) var(--space-5);
+    }
+    /* ─── VIEW 2: 个人 DUTY 专属详情页 ────────────────────────────── */
+    .duty-profile-hero {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .duty-profile-hero { grid-template-columns: 1fr; text-align: left; }
+    }
+    .profile-avatar-xl {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: var(--fg);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+    .profile-info-block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .profile-title {
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .profile-status-badge {
+      font-size: var(--text-xs);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-on-duty { background: var(--accent); color: #ffffff; }
+    .badge-off-duty { background: var(--surface); color: var(--muted); border: 1px solid var(--border-soft); }
+    .profile-meta-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+    .profile-meta-item strong { color: var(--fg); font-weight: 600; }
+    .cert-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-1);
+    }
+    .cert-chip {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      color: var(--fg-2);
+      font-family: var(--font-mono);
+    }
+
+    /* Personal Duty Grid: Responsibilities & Instruments */
+    .duty-details-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 920px) {
+      .duty-details-grid { grid-template-columns: 1fr; }
+    }
+
+    /* SOP List (No Checkboxes — 规范制度形式) */
+    .sop-item {
+      padding: var(--space-4);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      margin-bottom: var(--space-3);
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .sop-item:hover { background: var(--surface-warm); }
+    .sop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-3);
+      margin-bottom: var(--space-1);
+      flex-wrap: wrap;
+    }
+    .sop-title { font-size: var(--text-base); font-weight: 600; color: var(--fg); }
+    .sop-tag { font-size: 11px; font-family: var(--font-mono); color: var(--muted); }
+    .sop-desc { font-size: var(--text-sm); color: var(--fg-2); line-height: 1.5; }
+    .sop-spec {
+      margin-top: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Dedicated Instruments / Assigned Zone */
+    .instrument-card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .instrument-card-item:last-child { border-bottom: none; }
+    .inst-name { font-weight: 600; font-size: var(--text-sm); color: var(--fg); }
+    .inst-model { font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono); }
+    .inst-status-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .inst-good { background: rgba(22, 163, 74, 0.1); color: var(--success); }
+    .inst-warn { background: rgba(234, 179, 8, 0.15); color: #b45309; }
+
+    /* Personal Timeline & Shift History */
+    .personal-timeline-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .timeline-steps {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(210px, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      overflow-x: auto;
+      padding-bottom: var(--space-2);
+      scrollbar-width: thin;
+    }
+    .timeline-steps::-webkit-scrollbar { height: 4px; }
+    .timeline-steps::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    @media (max-width: 768px) {
+      .timeline-steps { grid-auto-columns: minmax(240px, 85%); }
+    }
+    .step-item {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      border: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .step-item.current {
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .step-badge { font-size: 10px; font-family: var(--font-mono); color: var(--muted); margin-bottom: var(--space-1); }
+    .step-date { font-size: var(--text-sm); font-weight: 600; color: var(--fg); margin-bottom: var(--space-1); }
+    .step-remark { font-size: var(--text-xs); color: var(--muted); line-height: 1.4; }
+
+    /* Modal / Dialog */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-base) var(--ease-standard);
+      overflow-y: auto;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-dialog {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 520px;
+      padding: var(--space-6);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+      transform: scale(0.95);
+      transition: transform var(--motion-base) var(--ease-standard);
+      margin-block: auto;
+    }
+    .modal-overlay.active .modal-dialog { transform: scale(1); }
+    .form-group { margin-bottom: var(--space-4); }
+    .form-label {
+      display: block;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: var(--space-2);
+    }
+    .form-select, .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--fg);
+      background: var(--surface-warm);
+      outline: none;
+      transition: border-color var(--motion-fast) var(--ease-standard);
+    }
+    .form-select:focus, .form-input:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: var(--focus-ring);
+    }
+    .radio-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-2);
+      cursor: pointer;
+      transition: all var(--motion-fast) var(--ease-standard);
+    }
+    .radio-row:hover { background: var(--surface); }
+    .radio-row input { accent-color: var(--accent); }
+    .radio-title { font-size: var(--text-sm); font-weight: 600; color: var(--fg); }
+    .radio-sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(29, 29, 31, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: var(--radius-pill);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform var(--motion-base) var(--ease-standard),
+                  opacity var(--motion-base) var(--ease-standard);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10000;
+      max-width: calc(100vw - 32px);
+    }
+    .toast-pill.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* Footer */
+    .lab-footer {
+      border-top: 1px solid var(--border-soft);
+      padding-block: var(--space-8);
+      color: var(--muted);
+      font-size: var(--text-xs);
+      text-align: center;
+      background: var(--bg);
+    }
+
+    /* ─── Print (实验室 A4 张贴) ───────────────────────────────────── */
+    @media print {
+      .top-bar, .member-selector-wrap, .cycle-toolbar, .roster-subtabs,
+      .lab-footer, .no-print, .modal-overlay,
+      .toast-pill, .btn { display: none !important; }
+      .shift-person-name svg, .slot-card svg { display: none !important; }
+      body { background: #fff; font-size: 10.5pt; color: #000; }
+      #view-duty { display: none !important; }
+      .card, .slot-card, .day-roster-card { box-shadow: none !important; border-color: #cbd5e1 !important; }
+      .roster-billboard { grid-template-columns: 1fr; }
+      .slot-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════ Top Navigation Bar ══════════════════════ -->
+  <header class="top-bar" data-od-id="top-nav">
+    <div class="container top-bar-inner">
+      <div class="brand-mark" onclick="switchMainView('roster')">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M10 2v7.31M14 2v7.31M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/>
+          </svg>
+        </div>
+        <span class="brand-text">LabDuty<span class="brand-sub"> · 实验室值日与协同管理平台</span></span>
+      </div>
+
+      <!-- Segmented Mode Control: Roster vs Duty -->
+      <nav class="view-segmented-control" aria-label="视图模式切换">
+        <button id="btn-seg-roster" class="view-seg-btn active" onclick="switchMainView('roster')">
+          <span class="seg-full">排班总览 (Roster)</span><span class="seg-short">排班</span>
+        </button>
+        <button id="btn-seg-duty" class="view-seg-btn" onclick="switchMainView('duty')">
+          <span class="seg-full">成员 Duty 专页</span><span class="seg-short">成员</span>
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="env-chip" id="env-chip" title="当前周期与运行状态">
+          <span class="pulse-dot" id="env-pulse-dot"></span>
+          <span id="env-chip-text">载入中…</span>
+        </div>
+
+        <!-- Quick Switch User Pill -->
+        <button class="user-quick-pill" onclick="switchMainView('duty')" title="点击查看当前成员专属 Duty 档案">
+          <span class="user-mini-avatar" id="top-user-avatar">黄</span>
+          <span class="user-name-text" id="top-user-name">H.W.Y · 灭菌保障</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════ Main Container ══════════════════════ -->
+  <main class="container workspace-wrap" id="content">
+
+    <!-- Universal Member Horizontal Switcher Bar -->
+    <section class="member-selector-wrap" data-od-id="member-selector">
+      <div class="member-selector-header">
+        <div>
+          <p class="eyebrow" style="margin-bottom: 2px;">LABORATORY MEMBERS · 实验室成员轮值序列</p>
+          <p style="font-size: var(--text-sm); color: var(--muted);">
+            点击任意成员即可直接进入其专属 Duty 职责页面，查看其固定责任区、专管物资与 11 期轮转轨迹
+          </p>
+        </div>
+      </div>
+
+      <div class="member-pills-scroll" id="member-scroll-list">
+        <!-- Rendered by JS: 11 laboratory members -->
+      </div>
+    </section>
+
+    <!-- Cycle Toolbar (周期标尺) -->
+    <section class="cycle-toolbar no-print" data-od-id="cycle-toolbar">
+      <div class="cycle-nav-group">
+        <button class="btn btn-secondary btn-pill-compact" onclick="changeCycle(-1)" title="向前回溯 2 周">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          上一周期
+        </button>
+        <button class="btn btn-primary btn-pill-compact" onclick="resetCycle()" title="回到 Day 1 所在的首个周期">本期 / 首期</button>
+        <button class="btn btn-secondary btn-pill-compact" onclick="changeCycle(1)" title="向后推演 2 周">
+          下一周期
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <span class="cycle-badge"><span class="dot"></span><span id="cycle-badge-text">第 1 周期</span></span>
+        <span class="cycle-range" id="cycle-range-text">2026/10/12 ~ 2026/10/25</span>
+      </div>
+
+      <div class="cycle-tools">
+        <label class="meta" for="date-picker-input" style="white-space:nowrap;">跳转日期</label>
+        <input type="date" id="date-picker-input" class="mini-input" onchange="onDatePickerChange(this.value)" />
+        <button class="btn btn-secondary btn-pill-compact" onclick="openDay1Modal()" id="btn-day1-config" title="设置 Day 1 基准起始日期">
+          Day 1：10/12
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         VIEW 1: ROSTER 排班全景系统 (Lab Roster & Rotation Schedule)
+         ═══════════════════════════════════════════════════════════════ -->
+    <div id="view-roster">
+
+      <!-- Billboard: Current Cycle & Roster Hub -->
+      <section class="roster-billboard" data-od-id="roster-billboard">
+        <div class="card billboard-hero-main">
+          <div>
+            <p class="eyebrow" id="billboard-eyebrow">ROSTER HUB · 第 1 周期 · DAY 1 – DAY 14</p>
+            <h1 class="billboard-title">实验室值日轮转与协同排班中心</h1>
+            <p class="billboard-desc">
+              本周期由 <strong>甲组全 11 人</strong> 执行值日轮转。轮换规则为<strong>全员整体下移一格、末位补首位</strong>，
+              覆盖枪头与 ddH₂O 灭菌、公共实验区与细胞房清洁、耗材补充及抽湿机每日维护。
+            </p>
+          </div>
+
+          <div class="roster-lead-row">
+            <div class="lead-avatar-lg" id="lead-avatar">焦</div>
+            <div class="lead-info-wrap">
+              <div class="lead-title-bar">
+                <span class="lead-name" id="lead-name">J.Y</span>
+                <span class="tag-duty-lead" id="lead-tag">每日在岗</span>
+              </div>
+              <div class="meta" style="margin-top: 3px;" id="lead-meta">
+                岗位 #10 · 每天倒细胞房抽湿机水箱 2 次 · 协同：Y.S.Y
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-pill-compact" id="lead-duty-btn" onclick="selectMemberAndOpenDuty('M10')">
+              查看该成员 Duty
+            </button>
+          </div>
+        </div>
+
+        <div class="card billboard-meta-card">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);">
+              <p class="eyebrow" style="margin-bottom: 0;">ROTATION RULES · 轮换规则与频次配额</p>
+              <span class="meta num">全员 11 人 · 循环 14 日</span>
+            </div>
+            <div class="roster-rules-list">
+              <div class="rule-item">
+                <span class="rule-dot"></span>
+                <span class="rule-text"><strong>整体下移一格</strong>：每 2 周轮换一次，每人整体向下移动一格，原末位（第 11 位）补到第 1 位，岗位职责内容保持不变。</span>
+              </div>
+              <div class="rule-item">
+                <span class="rule-dot"></span>
+                <span class="rule-text"><strong>频次分层</strong>：每日岗 2 人（抽湿机水箱早晚各 1 次）、每周岗 2 人（灭菌 / 耗材补充）、每 2 周岗 7 人（三区清洁）。</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: var(--space-2); margin-top: var(--space-3); flex-wrap: wrap;">
+            <button class="btn btn-primary btn-pill-compact" style="flex: 1; min-width: 130px;" onclick="openPrintHint()">
+              打印值日张贴表
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rotation Schedule Section -->
+      <section data-od-id="roster-calendar-section">
+        <div class="section-toolbar">
+          <div>
+            <h2 class="toolbar-title">轮值岗位与交替计划表</h2>
+            <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
+              点击任意成员可直接穿透至其个人 Duty 职责页面
+            </p>
+          </div>
+          <div class="roster-subtabs">
+            <button class="roster-subtab-btn active" id="tab-slots-btn" onclick="toggleRosterSubtab('slots')">本周期岗位视图</button>
+            <button class="roster-subtab-btn" id="tab-table-btn" onclick="toggleRosterSubtab('table')">轮换总览大表</button>
+          </div>
+        </div>
+
+        <!-- Slot Cards Grid (Default) -->
+        <div class="slot-grid" id="slot-card-grid">
+          <!-- Rendered by JS: 11 duty slots -->
+        </div>
+
+        <!-- Rotation Overview Table (Toggled) -->
+        <div class="month-roster-view" id="rotation-table-view">
+          <div class="table-scroll">
+            <table class="month-table">
+              <thead>
+                <tr>
+                  <th>岗位</th>
+                  <th>岗位职责内容</th>
+                  <th>频次</th>
+                  <th>本周期当值</th>
+                  <th>下周期接替</th>
+                  <th>协同成员</th>
+                  <th>专责焦点领域</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="rotation-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Roster Support: 实验室执行规约（依据原始规约表） -->
+      <section data-od-id="roster-support">
+
+        <!-- Lab Rules & Time Window -->
+        <div class="card" style="padding: var(--space-6);">
+          <div style="margin-bottom: var(--space-4);">
+            <h3 style="font-size: var(--text-lg); font-weight: 600;">值日执行规约与时间窗口</h3>
+            <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">依据实验室原始规约条款执行</p>
+          </div>
+          <div class="rules-grid">
+            <div class="rule-item">
+              <span class="rule-dot"></span>
+              <span class="rule-text"><strong>清洁时间窗口</strong>：每个月第一个 / 第三个礼拜内完成全套打扫清洁。</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-dot"></span>
+              <span class="rule-text"><strong>枪头插盒指标</strong>：每周每人插枪头 ≥ 10 盒，按各规格消耗量灵活安排。</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-dot"></span>
+              <span class="rule-text"><strong>库存核查频次</strong>：固定责任人每周检查库存 2 次（周一 Mon / 周四 Thu）。</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         VIEW 2: 个人 DUTY 专属页面 (Personal Duty Hub)
+         ═══════════════════════════════════════════════════════════════ -->
+    <div id="view-duty">
+
+      <!-- Member Profile Header Hero -->
+      <section class="duty-profile-hero" data-od-id="duty-profile-hero">
+        <div class="profile-avatar-xl" id="duty-avatar-box">黄</div>
+
+        <div class="profile-info-block">
+          <div class="profile-name-row">
+            <h1 class="profile-title" id="duty-name-display">H.W.Y</h1>
+            <span class="profile-status-badge badge-on-duty" id="duty-status-badge">每周在岗执行</span>
+            <span class="meta" id="duty-role-title">分子生物学 · 公用分子试剂主管</span>
+          </div>
+
+          <div class="profile-meta-grid">
+            <span class="profile-meta-item">固定分工：<strong id="duty-fixed-meta">公用分子试剂</strong></span>
+            <span class="profile-meta-item">本周期岗位：<strong id="duty-slot-meta">枪头与 ddH₂O 灭菌</strong></span>
+            <span class="profile-meta-item">执行频次：<strong id="duty-freq-meta">每周 1 次</strong></span>
+            <span class="profile-meta-item">下期岗位：<strong id="duty-next-meta">打扫实验室</strong></span>
+          </div>
+
+          <div class="cert-chips-row" id="duty-certs-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-2); min-width: 150px;">
+          <button class="btn btn-primary btn-pill-compact" onclick="switchMainView('roster')">
+            查看实验室总排班
+          </button>
+          <button class="btn btn-secondary btn-pill-compact" onclick="openPrintHint()">
+            打印值日张贴表
+          </button>
+        </div>
+      </section>
+
+      <!-- Personal Duty Details -->
+      <section class="duty-details-grid" data-od-id="duty-details-grid">
+
+        <!-- Left: SOP for the member's CURRENT slot (rotates with them) -->
+        <div class="card" style="padding: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
+            <div>
+              <h2 style="font-size: var(--text-xl); font-weight: 600;">本周期值日专责规程与执行标准</h2>
+              <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
+                规程随岗位轮转变化 · 明确责任边界与执行标准（SOP 规范）
+              </p>
+            </div>
+            <span class="meta" id="duty-sop-count">3 项核心专责</span>
+          </div>
+
+          <div id="duty-sop-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Right: Fixed responsibility zone & dedicated assets -->
+        <div class="card" style="padding: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
+            <div>
+              <h2 style="font-size: var(--text-xl); font-weight: 600;">固定责任区与专管物资</h2>
+              <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
+                常态化分工，每周一 / 周四定期盘点核验
+              </p>
+            </div>
+            <span class="meta" id="duty-inst-count">2 项责任区</span>
+          </div>
+
+          <div id="duty-instruments-list">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-soft);">
+            <h3 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2);">
+              个人交接备忘
+            </h3>
+            <div id="duty-personal-memo-box" style="padding: var(--space-3); background: var(--surface); border-radius: var(--radius-md); font-size: var(--text-xs); color: var(--fg-2); line-height: 1.5;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Personal Rotation Timeline (11 cycles) -->
+      <section class="personal-timeline-card" data-od-id="duty-personal-timeline">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); flex-wrap: wrap;">
+          <div>
+            <h2 style="font-size: var(--text-xl); font-weight: 600;">轮值履约时间轴与全周期档案</h2>
+            <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
+              该成员未来 11 个周期的完整轮转轨迹（11 期为一整轮闭环）
+            </p>
+          </div>
+          <span class="meta">循环闭环 · 11 期覆盖全部岗位</span>
+        </div>
+
+        <div class="timeline-steps" id="duty-timeline-steps">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Clean Footer -->
+  <footer class="lab-footer">
+    <div class="container">
+      <p>LabDuty 实验室值日与协同管理平台 · 全员 11 人 · 14 日轮换周期</p>
+      <p style="margin-top: 4px; color: var(--meta);">岗位职责、清洁 SOP 与执行规约均依据实验室原始规约表制定 · 数据存储于本地浏览器</p>
+    </div>
+  </footer>
+
+  <!-- ══════════ Modal: Day 1 基准日期配置 ══════════ -->
+  <div class="modal-overlay" id="day1-modal" role="dialog" aria-modal="true" aria-labelledby="day1-modal-title">
+    <div class="modal-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-4);">
+        <h3 id="day1-modal-title" style="font-size: var(--text-xl); font-weight: 600;">设置 Day 1 基准起始时间</h3>
+        <button onclick="closeDay1Modal()" style="color: var(--muted); font-size: var(--text-base); line-height: 1;" aria-label="关闭">✕</button>
+      </div>
+
+      <p style="font-size: var(--text-sm); color: var(--muted); margin-bottom: var(--space-4);">
+        选择实验室第 1 周期（甲组初始）正式启动的 <strong>Day 1</strong> 日期：
+      </p>
+
+      <label class="radio-row" for="preset-oct12">
+        <input type="radio" name="day1-preset" id="preset-oct12" value="2026-10-12" onchange="onDay1PresetSelect('2026-10-12')" />
+        <span>
+          <span class="radio-title">2026-10-12（10 月第 3 周周一，当前设定）</span><br />
+          <span class="radio-sub">Day 1 – Day 14 对应 2026/10/12 ~ 2026/10/25</span>
+        </span>
+      </label>
+
+      <label class="radio-row" for="preset-oct19">
+        <input type="radio" name="day1-preset" id="preset-oct19" value="2026-10-19" onchange="onDay1PresetSelect('2026-10-19')" />
+        <span>
+          <span class="radio-title">2026-10-19（10 月第 4 周 / 第 3 个完整周）</span><br />
+          <span class="radio-sub">Day 1 – Day 14 对应 2026/10/19 ~ 2026/11/01</span>
+        </span>
+      </label>
+
+      <div class="form-group" style="margin-top: var(--space-4);">
+        <label class="form-label" for="custom-day1-date">或自定义起始日期</label>
+        <input type="date" class="form-input" id="custom-day1-date" value="2026-10-12" onchange="onCustomDay1DateChange(this.value)" />
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-6); flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary btn-pill-compact" onclick="closeDay1Modal()">取消</button>
+        <button type="button" class="btn btn-primary btn-pill-compact" onclick="saveDay1Setting()">保存并生效</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast-pill" id="app-toast" role="status" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M20 6L9 17l-5-5"/>
+    </svg>
+    <span id="toast-msg">已记录更新</span>
+  </div>
+
+  <!-- ══════════════════════ Application Logic ══════════════════════ -->
+  <script>
+    /* ─────────────────────────────────────────────────────────────
+     * 1. 实验室基础数据（源自实验室原始规约表，11 人编制）
+     * ───────────────────────────────────────────────────────────── */
+
+    /* 脱敏说明（重要）
+     * 为便于公开部署，成员一律以「姓氏首字母 + 名字首字母」的拼音缩写表示（如 H.W.Y），
+     * 成员 ID 使用中性代号 M01–M11；真实姓名与拼音全拼不进入本仓库。
+     * 若需在受控环境还原真实姓名，只需改写下面的 name 字段（并同步 MEMBERS 的 name）。 */
+
+    // 甲组初始队列（索引 0 – 10），对应岗位 #1 – #11
+    const BASE_MEMBERS = [
+      { id: 'M01', name: 'H.W.Y' },
+      { id: 'M02', name: 'X.Z' },
+      { id: 'M03', name: 'L.L.Q' },
+      { id: 'M04', name: 'Y.J.X' },
+      { id: 'M05', name: 'G.R.Q' },
+      { id: 'M06', name: 'G.R' },
+      { id: 'M07', name: 'Z.Y.H' },
+      { id: 'M08', name: 'L.Y.Y' },
+      { id: 'M09', name: 'Z.L.D' },
+      { id: 'M10', name: 'J.Y' },
+      { id: 'M11', name: 'Y.S.Y' }
+    ];
+
+    // 区域清洁 SOP（原始规约表第三部分）
+    const SOP_CELL = [
+      { title: '安全柜内壁与器械擦拭并照紫外', tag: '细胞房 SOP · 台面级', desc: '清理、擦拭安全柜内部、所有移液枪与 Racks，每次处理 1 个台面后照紫外灭菌。', spec: '标准：操作前后各照紫外，台面无残留培养液与粉尘' },
+      { title: '桌面、仪器与培养箱表面清洁', tag: '细胞房 SOP · 仪器级', desc: '清理并擦拭桌面，以及离心机、计数仪、显微镜和 CO₂ 培养箱表面。', spec: '标准：仪器缝隙与把手无污渍，培养箱内壁无水渍霉斑' },
+      { title: '扫地并以 84 消毒液拖地', tag: '细胞房 SOP · 地面级', desc: '扫地后用 84 消毒液拖地，结束后照紫外 2h 并关闭紫外灯。', spec: '标准：消毒液按规定稀释 · 紫外累计 2h 后必须关闭' },
+      { title: '更换细胞房水浴锅水', tag: '细胞房 SOP · 液体级', desc: '排空并更换细胞房水浴锅用水，避免水垢与微生物滋生。', spec: '标准：换水后水位在刻度区间，锅体无霉斑' },
+      { title: '防护服清洗晾干并照紫外', tag: '细胞房 SOP · 防护用品', desc: '防护服洗并晾干，照紫外，分 2 批，每轮洗一批。', spec: '标准：每轮仅清洗一批，确保照紫外充分' },
+      { title: '清洗拖鞋', tag: '细胞房 SOP · 防护用品', desc: '清洗细胞房专用拖鞋，保持洁净并晾干归位。', spec: '标准：拖鞋无污渍异味，按位摆放' }
+    ];
+    const SOP_LAB = [
+      { title: '清理公共实验桌面并拖地', tag: '实验室 SOP · 台面与地面', desc: '清理公共实验桌面，保持干燥整齐，地面彻底拖洗干净。', spec: '标准：台面物品按类归位，地面无试剂残留' },
+      { title: '冰箱清霜', tag: '实验室 SOP · 低温设备', desc: '对公共冰箱进行清霜与规整，避免积霜影响温控效率。', spec: '标准：霜层厚度控制在合理范围，箱内样品标签清晰' },
+      { title: '水浴锅换水', tag: '实验室 SOP · 液体级', desc: '更换公共水浴锅用水，清洁锅底沉积物。', spec: '标准：换水后温控稳定，锅底无沉淀结垢' },
+      { title: '整理货架（包括洗衣机房间）', tag: '实验室 SOP · 内务', desc: '整理公用货架物资，含洗衣机房间的分类与堆叠。', spec: '标准：货架分区清晰，通道保持畅通' }
+    ];
+    const SOP_LOUNGE = [
+      { title: '清理休息室冰箱', tag: '休息室 SOP · 低温设备', desc: '清理休息室冰箱，清除过期或无标记食品，擦拭隔板去除异味。', spec: '标准：无过期食品残留，隔板洁净无异味' },
+      { title: '休息室拖地', tag: '休息室 SOP · 地面', desc: '彻底清扫并拖净休息室地面，清倒垃圾桶并更换垃圾袋。', spec: '标准：地面洁净无水渍，垃圾桶已套新袋' }
+    ];
+    const SOP_STERILIZE = [
+      { title: '各规格枪头高压灭菌与烘干', tag: '灭菌保障 · 每周', desc: '各规格枪头装盒后行高压灭菌，灭菌完成后烘干备用。', spec: '标准：121℃ / 20min 灭菌，化学指示胶带完全变色' },
+      { title: 'ddH₂O 制备与灭菌', tag: '灭菌保障 · 每周', desc: '制备超纯水并高压灭菌，分装存放供全组使用。', spec: '标准：超纯水电阻率 18.2 MΩ·cm，灭菌水 4℃ 存放' },
+      { title: '周内用量存量保障', tag: '灭菌保障 · 盘点', desc: '盘点枪头与 ddH₂O 存量，确保至少周内够用。', spec: '标准：存量低于周用量阈值时立即补制' }
+    ];
+    const SOP_SUPPLY = [
+      { title: '细胞房 working stock 补充', tag: '耗材补充 · 每周', desc: '补充细胞房内各种常用耗材，填满 working stock。', spec: '标准：加样槽、培养皿、离心管等常用项无空缺' },
+      { title: '耗材余量盘点与申购联动', tag: '耗材补充 · 盘点', desc: '盘点细胞房耗材余量，不足项登记至告罄白板并联动申购。', spec: '标准：临期缺货项 24h 内完成白板登记' }
+    ];
+    const SOP_DEHUMID = [
+      { title: '每天倒细胞房抽湿机水箱 2 次', tag: '日常维护 · 每天 2 次', desc: '每天早、晚各倒 1 次细胞房抽湿机水箱，避免溢水停机。', spec: '标准：水箱水位不超过 2/3，地面无溢水痕迹' },
+      { title: '抽湿机运行状态与恒湿环境检查', tag: '日常维护 · 巡检', desc: '检查抽湿机运行状态与细胞房湿度，确保恒湿环境稳定。', spec: '标准：设备连续运行无报警，湿度处于设定区间' }
+    ];
+
+    // 11 个岗位槽位（岗位职责内容与频次 1:1 还原原始规约表）
+    const ROSTER_SLOTS = [
+      { id: 0,  title: '各规格枪头灭菌烘干、ddH₂O 灭菌（至少周内够用）', short: '枪头与 ddH₂O 灭菌',
+        freq: 'Every week', freqCn: '每周 1 次', freqType: 'weekly', group: '灭菌保障组', mates: [0],
+        focus: '灭菌存量与无菌保障', sop: SOP_STERILIZE,
+        desc: '负责各规格枪头高压灭菌烘干与 ddH₂O 制备灭菌，保障全组周内用量。' },
+      { id: 1,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
+        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
+        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
+      { id: 2,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
+        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
+        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
+      { id: 3,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
+        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
+        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
+      { id: 4,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
+        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
+        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
+      { id: 5,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
+        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
+        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
+      { id: 6,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
+        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
+        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
+      { id: 7,  title: '打扫休息室', short: '打扫休息室',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '休息室保洁组', mates: [7],
+        focus: '休息区卫生与冰箱清理', sop: SOP_LOUNGE,
+        desc: '休息室冰箱清理与地面拖洗，清倒垃圾并更换垃圾袋。' },
+      { id: 8,  title: '补充细胞房内各种常用耗材，填满 working stock', short: '细胞房耗材补充',
+        freq: 'Every week', freqCn: '每周 1 次', freqType: 'weekly', group: '细胞房耗材组', mates: [8],
+        focus: '细胞房耗材 working stock 补足', sop: SOP_SUPPLY,
+        desc: '定期检查细胞房耗材余量，及时补齐加样槽、培养皿、离心管等 working stock。' },
+      { id: 9,  title: '每天倒细胞房抽湿机水箱 2 次', short: '倒抽湿机水箱（2 人轮值）',
+        freq: 'Every day', freqCn: '每天 2 次', freqType: 'daily', group: '抽湿机日常维护', mates: [9, 10],
+        focus: '抽湿机恒湿环境维护', sop: SOP_DEHUMID,
+        desc: '每天早 / 晚各倒 1 次细胞房抽湿机水箱，避免溢水停机，保持恒湿环境。' },
+      { id: 10, title: '每天倒细胞房抽湿机水箱 2 次', short: '倒抽湿机水箱（2 人轮值）',
+        freq: 'Every day', freqCn: '每天 2 次', freqType: 'daily', group: '抽湿机日常维护', mates: [9, 10],
+        focus: '抽湿机恒温恒湿环境维护', sop: SOP_DEHUMID,
+        desc: '每天早 / 晚各倒 1 次细胞房抽湿机水箱，避免溢水停机，保持恒湿环境。' }
+    ];
+
+    // 11 位成员的个人档案（长期固定分工 + 专管物资 / 责任区 + 交接备忘）
+    const MEMBERS = {
+      M01: {
+        name: 'H.W.Y', domain: '分子生物学', roleTitle: '公用分子试剂主管',
+        fixedContent: '订购、管理公用分子试剂',
+        fixedDetails: '负责公用酶类、PCR 试剂盒、质粒提取 Kit、DNA/RNA Marker、引物等订购与库存盘点。',
+        assets: [
+          { name: '公用分子试剂冷柜', model: '酶类 / PCR 试剂盒 · 4℃ 分区', status: '库存正常', statusType: 'good' },
+          { name: '引物与 DNA Marker 台账', model: '订购与领用登记 · 周盘点', status: '台账齐全', statusType: 'good' }
+        ],
+        memo: '公用分子试剂冷柜已按酶类 / 试剂盒分区整理，引物合成单已归档；下批引物到货后请按标签入格。',
+      },
+      M02: {
+        name: 'X.Z', domain: '财务与公账', roleTitle: '实验室公账与报销主管',
+        fixedContent: '日常报销、实验室公账管理',
+        fixedDetails: '负责发票审核报销、课题组公账台账登记、实验经费对账与财务统筹。',
+        assets: [
+          { name: '实验室公账与报销台账', model: '发票审核 · 月度对账', status: '月度已对账', statusType: 'good' },
+          { name: '发票与采购合同归档', model: '纸质 + 电子双份归档', status: '待整理归档', statusType: 'warn' }
+        ],
+        memo: '本月发票已提交报销流程，试剂采购合同待归档入册，请相关同学补齐签收单后交予我对账。',
+      },
+      M03: {
+        name: 'L.L.Q', domain: '动物实验', roleTitle: '动物实验物资主管',
+        fixedContent: '订购、管理动物实验公共试剂药品',
+        fixedDetails: '负责动物麻醉药品、手术器械包、动物房耗材、消毒杀菌试剂申领与台账管理。',
+        assets: [
+          { name: '动物实验药品柜', model: '麻醉剂 / 药品 · 双人登记', status: '双人登记执行中', statusType: 'good' },
+          { name: '手术器械与动物房耗材', model: '器械包 / 垫料 / 消毒剂', status: '库存正常', statusType: 'good' }
+        ],
+        memo: '动物实验药品柜严格执行双人登记领用；手术器械包已灭菌归位，动物房垫料库存充足。',
+      },
+      M04: {
+        name: 'Y.J.X', domain: '环保与安全', roleTitle: '废弃物与危化回收主管',
+        fixedContent: '清理空瓶、锐器盒、门外垃圾桶并按学校通知定期回收',
+        fixedDetails: '负责化学空瓶规范回收、锐器盒封箱、危化废液申报及实验区外部垃圾桶清运。',
+        assets: [
+          { name: '化学空瓶暂存区', model: '按学校通知定期集中回收', status: '待集中回收', statusType: 'warn' },
+          { name: '锐器盒与危废暂存柜', model: '密封封箱 · 台账登记', status: '封装正常', statusType: 'good' }
+        ],
+        memo: '化学空瓶已分类暂存，待学校回收通知；锐器盒请勿超过标示容量线，满盒后交由我封箱登记。',
+      },
+      M05: {
+        name: 'G.R.Q', domain: '资产与设备', roleTitle: '仪器维修与资产主管',
+        fixedContent: '机动项目，如仪器维修、仪器购买和资产入账等',
+        fixedDetails: '负责离心机 / 显微镜 / 超纯水等仪器报修报维、新购仪器论证、固定资产条码入账。',
+        assets: [
+          { name: '大型仪器资产台账', model: '固定资产条码与档案', status: '台账完整', statusType: 'good' },
+          { name: '报修与维保工单', model: '报修受理 · 厂家联络', status: '1 单处理中', statusType: 'warn' }
+        ],
+        memo: '在修仪器工单已跟进厂家；新到仪器请及时告知我完成资产条码入账，避免漏登。',
+      },
+      M06: {
+        name: 'G.R', domain: '流式与免疫', roleTitle: '流式抗体与细胞因子主管',
+        fixedContent: '订购、管理公用流式抗体、细胞因子',
+        fixedDetails: '负责荧光单克隆抗体、分选试剂盒、重组蛋白细胞因子库存监控与冷链避光保存。',
+        assets: [
+          { name: '流式抗体 4℃ 避光柜', model: '荧光单抗 · 避光分区', status: '冷链正常', statusType: 'good' },
+          { name: '细胞因子 -20℃ 库', model: '重组蛋白 · 分装冻存', status: '分装规范', statusType: 'good' }
+        ],
+        memo: '流式抗体请严格避光并及时回 4℃；细胞因子分装冻存后避免反复冻融，用完请告知我登记。',
+      },
+      M07: {
+        name: 'Z.Y.H', domain: '网络与 IT', roleTitle: '实验室网络与数字资产主管',
+        fixedContent: '实验室网络资源管理及维护',
+        fixedDetails: '维护实验室局域网、NAS 存储备份、服务器、仪器工作站网络联通及公共文献账号。',
+        assets: [
+          { name: '实验室局域网与路由', model: '内网 / 无线 · 运行监控', status: '运行中', statusType: 'good' },
+          { name: 'NAS 数据备份中心', model: '共享盘 · 定期备份', status: '容量 78%', statusType: 'warn' }
+        ],
+        memo: 'NAS 容量已近八成，请各位及时清理临时数据；文献下载账号异常请第一时间联系我排查。',
+      },
+      M08: {
+        name: 'L.Y.Y', domain: '细胞培养基', roleTitle: '血清与培养基主管',
+        fixedContent: '订购、管理公用血清、培养基',
+        fixedDetails: '负责胎牛血清（FBS）批次测试与订购、DMEM / 1640 培养基、双抗及各类添加剂库存。',
+        assets: [
+          { name: 'FBS 胎牛血清 -20℃ 库', model: '批次记录 · 分装冻存', status: '库存偏低', statusType: 'warn' },
+          { name: '培养基与双抗', model: 'DMEM / 1640 / 双抗', status: '库存正常', statusType: 'good' }
+        ],
+        memo: '血清库存偏低，已提交采购申请；新批次血清到货后需先做批次测试再全量投入使用。',
+      },
+      M09: {
+        name: 'Z.L.D', domain: '气瓶与低温', roleTitle: '气体与液氮储备主管',
+        fixedContent: '订购、管理二氧化碳 / 氮气气瓶和液氮补充',
+        fixedDetails: '负责 CO₂ 气瓶减压阀巡检、液氮罐液位检测、定期联系供应商加气与灌充液氮。',
+        assets: [
+          { name: 'CO₂ / N₂ 汇流排气瓶', model: '减压阀压力巡检', status: '压力正常', statusType: 'good' },
+          { name: '液氮罐', model: '液位检测 · 定期灌充', status: '液位 62%', statusType: 'good' }
+        ],
+        memo: '气瓶压力表读数正常，液氮罐液位 62% 属于安全区间；液位低于 40% 时请提醒我安排灌充。',
+      },
+      M10: {
+        name: 'J.Y', domain: '细胞耗材', roleTitle: '细胞耗材与消毒剂主管',
+        fixedContent: '订购、管理 T25 / T75 / T175、10cm 皿、6 孔板、12 孔板、加样槽、15ml 管、50ml 管、细胞冻存管、75% 酒精等',
+        fixedDetails: '全面负责细胞房塑料耗材供应链保障，并负责 75% 医用酒精的调配与补给。',
+        assets: [
+          { name: '细胞培养耗材库', model: 'T25 / T75 / T175 · 皿 · 板 · 管', status: '供应正常', statusType: 'good' },
+          { name: '75% 酒精调配与发放', model: '配制 · 分装 · 补给', status: '补给及时', statusType: 'good' }
+        ],
+        memo: '细胞培养瓶与孔板库存正常；75% 酒精已补充到位，请各工位自取后及时加盖避免挥发。',
+      },
+      M11: {
+        name: 'Y.S.Y', domain: '公共 Buffer', roleTitle: '公共生化缓冲液配制主管',
+        fixedContent: '订购、配制公用 buffer（running buffer, TAE, TBST 等）',
+        fixedDetails: '负责配制 10x Running Buffer、50x TAE、10x TBST、PBS 等公共实验常用基础母液。',
+        assets: [
+          { name: '公共 Buffer 母液库', model: 'Running / TAE / TBST / PBS', status: '母液充足', statusType: 'good' },
+          { name: 'Buffer 配制记录台账', model: '配制日期 · 批次记录', status: '周更新', statusType: 'good' }
+        ],
+        memo: 'TAE 与 TBST 母液已配制并贴标；请取用后拧紧瓶盖，母液剩余不足三分之一时请告知我补配。',
+      }
+    };
+
+    /* ─────────────────────────────────────────────────────────────
+     * 2. 轮换引擎与日期基准（Day 1 = 10 月第 3 周周一）
+     * ───────────────────────────────────────────────────────────── */
+    const STORAGE_KEY_DAY1 = 'labduty_day1_date_v3';
+    // 注：签名确认存根 / 试剂耗材告罄白板 / 每周插枪头进度 三项工具为 Roadmap 暂缓项，
+    //     其存储键与读写逻辑已一并移出，详见 docs/roadmap.md。
+    const DEFAULT_DAY1_DATE = '2026-10-12';
+    const MEMBER_COUNT = BASE_MEMBERS.length;   // 11
+    const CYCLE_DAYS = 14;                       // 2 周
+
+    // 安全存储封装：file:// 源或隐私模式下 localStorage 可能不可用，此处降级为内存态
+    const LS = (() => {
+      try {
+        const probe = '__labduty_probe__';
+        window.localStorage.setItem(probe, '1');
+        window.localStorage.removeItem(probe);
+        return window.localStorage;
+      } catch (e) {
+        const mem = {};
+        return {
+          getItem: k => (k in mem ? mem[k] : null),
+          setItem: (k, v) => { mem[k] = String(v); },
+          removeItem: k => { delete mem[k]; }
+        };
+      }
+    })();
+
+    let BASE_START_DATE = new Date((LS.getItem(STORAGE_KEY_DAY1) || DEFAULT_DAY1_DATE) + 'T00:00:00');
+    let currentCycleOffset = 0;
+    let currentActiveMemberId = 'M01';
+    let currentMainView = 'roster';
+    let activeRosterSubtab = 'slots';
+
+    const memberIndexById = {};
+    BASE_MEMBERS.forEach((m, i) => { memberIndexById[m.id] = i; });
+
+    function getSavedDay1Date() { return LS.getItem(STORAGE_KEY_DAY1) || DEFAULT_DAY1_DATE; }
+
+    // 指定日期的周期偏移量（可为负 = 筹备期）
+    function getCycleOffsetFromDate(d) {
+      const dayDiff = Math.floor((d.getTime() - BASE_START_DATE.getTime()) / 86400000);
+      return Math.floor(dayDiff / CYCLE_DAYS);
+    }
+    // 今日真实周期（Day 1 之前展示首期）
+    function getInitialCycleOffset() {
+      const off = getCycleOffsetFromDate(new Date());
+      return off < 0 ? 0 : off;
+    }
+    // 周期起止日期文本
+    function getCycleDateRange(offset) {
+      const start = new Date(BASE_START_DATE.getTime() + offset * CYCLE_DAYS * 86400000);
+      const end = new Date(start.getTime() + (CYCLE_DAYS - 1) * 86400000);
+      const f = d => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+      return `${f(start)} ~ ${f(end)}`;
+    }
+    // 周期徽章文案
+    function getCycleLabel(offset) {
+      if (offset < 0) return '筹备期（Day 1 启动前）';
+      const day1 = offset * CYCLE_DAYS + 1;
+      const day2 = offset * CYCLE_DAYS + CYCLE_DAYS;
+      const base = `第 ${offset + 1} 周期 [Day ${day1} – Day ${day2}]`;
+      return offset === 0 ? base + '（甲组初始）' : base;
+    }
+
+    // ★ 核心轮换算法：周期 offset 下，岗位 slotId 的当值人
+    // 规则：每人整体下移一格，末位补首位（数组循环右移）
+    function getMemberIdForSlot(slotId, offset) {
+      const o = ((offset % MEMBER_COUNT) + MEMBER_COUNT) % MEMBER_COUNT;
+      const idx = (((slotId - o) % MEMBER_COUNT) + MEMBER_COUNT) % MEMBER_COUNT;
+      return BASE_MEMBERS[idx].id;
+    }
+    // 反向：成员在周期 offset 下所处的岗位
+    function getSlotIdForMember(memberId, offset) {
+      const i = memberIndexById[memberId];
+      if (i === undefined) return 0;
+      const o = ((offset % MEMBER_COUNT) + MEMBER_COUNT) % MEMBER_COUNT;
+      return (i + o) % MEMBER_COUNT;
+    }
+    // 同组协同成员（排除自己）
+    function getTeammates(slot, offset, selfId) {
+      if (!slot.mates || slot.mates.length <= 1) return [];
+      return slot.mates
+        .map(s => getMemberIdForSlot(s, offset))
+        .filter(id => id !== selfId)
+        .map(id => MEMBERS[id].name);
+    }
+    // 成员状态徽章（依据岗位频次）
+    function getMemberStatus(slot, offset) {
+      if (offset < 0) return { text: '筹备期 · 待启动', cls: 'badge-off-duty' };
+      if (slot.freqType === 'daily') return { text: '每日在岗执行', cls: 'badge-on-duty' };
+      if (slot.freqType === 'weekly') return { text: '本周在岗执行', cls: 'badge-on-duty' };
+      return { text: '本周期履约中', cls: 'badge-off-duty' };
+    }
+    function freqChipClass(t) {
+      return t === 'daily' ? 'freq-daily' : t === 'weekly' ? 'freq-weekly' : 'freq-biweekly';
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 3. 本地存储状态
+     * ───────────────────────────────────────────────────────────── */
+    function readJSON(key, fallback) {
+      try { const raw = LS.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+      catch (e) { return fallback; }
+    }
+
+    /* 注：原「签名确认存根 / 告罄白板 / 插枪头进度」的本地存储读写函数
+     *     （getSignLogs / getShortage / getTips 等）已随三项工具一并移出。
+     *     重新引入时的数据模型与实现要点见 docs/roadmap.md。 */
+
+    /* ─────────────────────────────────────────────────────────────
+     * 4. 渲染：成员选择条 / 顶栏
+     * ───────────────────────────────────────────────────────────── */
+    function renderMemberSelectorPills() {
+      const box = document.getElementById('member-scroll-list');
+      box.innerHTML = '';
+      BASE_MEMBERS.forEach(m => {
+        const slotId = getSlotIdForMember(m.id, currentCycleOffset);
+        const slot = ROSTER_SLOTS[slotId];
+        const isActive = m.id === currentActiveMemberId;
+        const badge = (currentCycleOffset >= 0 && (slot.freqType === 'daily' || slot.freqType === 'weekly'))
+          ? `<span class="badge-today-duty">${slot.freqType === 'daily' ? '每日' : '每周'}</span>` : '';
+
+        const card = document.createElement('div');
+        card.className = `member-nav-card ${isActive ? 'active' : ''}`;
+        card.onclick = () => selectMemberAndOpenDuty(m.id);
+        card.innerHTML = `
+          <div class="member-nav-avatar">${esc(m.name.charAt(0))}</div>
+          <div>
+            <div class="member-name-main">${esc(m.name)}${badge}</div>
+            <div class="member-role-sub">岗位 #${slotId + 1} · ${esc(slot.short)}</div>
+          </div>
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function renderEnvChip() {
+      const text = document.getElementById('env-chip-text');
+      const dot = document.getElementById('env-pulse-dot');
+      const now = new Date();
+      const dayDiff = Math.floor((now.getTime() - BASE_START_DATE.getTime()) / 86400000);
+
+      if (dayDiff < 0) {
+        dot.classList.add('is-prep');
+        text.textContent = `距 Day 1 还有 ${Math.abs(dayDiff)} 天`;
+      } else {
+        dot.classList.remove('is-prep');
+        const dayNo = dayDiff + 1;
+        const cyc = Math.floor(dayDiff / CYCLE_DAYS) + 1;
+        text.textContent = `Day ${dayNo} · 第 ${cyc} 周期`;
+      }
+    }
+
+    // 岗位的紧凑标签（用于顶栏胶囊等窄空间）
+    function navTagForSlot(slot) {
+      return slot.group.replace(/组$/, '').replace('抽湿机日常维护', '抽湿机维护');
+    }
+
+    function renderCycleToolbar() {
+      document.getElementById('cycle-badge-text').textContent = getCycleLabel(currentCycleOffset);
+      document.getElementById('cycle-range-text').textContent = getCycleDateRange(currentCycleOffset);
+      document.getElementById('billboard-eyebrow').textContent = currentCycleOffset < 0
+        ? 'ROSTER HUB · 筹备期 · DAY 1 启动前（展示甲组初始排班）'
+        : `ROSTER HUB · 第 ${currentCycleOffset + 1} 周期 · DAY ${currentCycleOffset * CYCLE_DAYS + 1} – DAY ${currentCycleOffset * CYCLE_DAYS + CYCLE_DAYS}`;
+
+      const btn = document.getElementById('btn-day1-config');
+      btn.textContent = `Day 1：${getSavedDay1Date().slice(5).replace('-', '/')}`;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 5. 渲染：Roster billboard / 岗位卡片 / 总览大表
+     * ───────────────────────────────────────────────────────────── */
+    function renderBillboardLead() {
+      // 焦点 = 频次最高的「每日岗」（岗位 #10）
+      const slotId = 9;
+      const slot = ROSTER_SLOTS[slotId];
+      const id = getMemberIdForSlot(slotId, currentCycleOffset);
+      const mates = getTeammates(slot, currentCycleOffset, id);
+
+      document.getElementById('lead-avatar').textContent = MEMBERS[id].name.charAt(0);
+      document.getElementById('lead-name').textContent = MEMBERS[id].name;
+      document.getElementById('lead-tag').textContent = currentCycleOffset < 0 ? '筹备期' : '每日在岗';
+      document.getElementById('lead-meta').textContent =
+        `岗位 #${slotId + 1} · ${slot.title}${mates.length ? ' · 协同：' + mates.join('、') : ''}`;
+      document.getElementById('lead-duty-btn').onclick = () => selectMemberAndOpenDuty(id);
+    }
+
+    function renderSlotCards() {
+      const grid = document.getElementById('slot-card-grid');
+      grid.innerHTML = '';
+
+      ROSTER_SLOTS.forEach((slot, i) => {
+        const id = getMemberIdForSlot(slot.id, currentCycleOffset);
+        const nextId = getMemberIdForSlot(slot.id, currentCycleOffset + 1);
+        const mates = getTeammates(slot, currentCycleOffset, id);
+        const isFocus = i === 9;
+
+        const card = document.createElement('div');
+        card.className = `slot-card ${slot.freqType === 'daily' ? 'is-daily' : ''} ${isFocus ? 'is-current-focus' : ''}`;
+        card.innerHTML = `
+          <div>
+            <div class="day-card-header">
+              <span class="day-name">岗位 #${slot.id + 1}</span>
+              <span class="freq-chip ${freqChipClass(slot.freqType)}">${esc(slot.freqCn)}</span>
+            </div>
+
+            <div class="shift-person-slot" onclick="selectMemberAndOpenDuty('${id}')">
+              <span class="shift-person-role">本周期当值人</span>
+              <span class="shift-person-name">
+                ${esc(MEMBERS[id].name)}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+              <span class="shift-scope-tag">${esc(slot.focus)}</span>
+            </div>
+
+            <div class="slot-duty-title" style="margin-top: var(--space-3);">${esc(slot.short)}</div>
+            <p class="slot-desc">${esc(slot.desc)}</p>
+          </div>
+
+          <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border-soft);">
+            <div class="meta" style="display:flex; justify-content:space-between; gap:8px;">
+              <span>协同：${mates.length ? esc(mates.join('、')) : '独立负责'}</span>
+              <span>下期 → ${esc(MEMBERS[nextId].name)}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderRotationTable() {
+      const tbody = document.getElementById('rotation-table-body');
+      tbody.innerHTML = '';
+
+      ROSTER_SLOTS.forEach(slot => {
+        const id = getMemberIdForSlot(slot.id, currentCycleOffset);
+        const nextId = getMemberIdForSlot(slot.id, currentCycleOffset + 1);
+        const mates = getTeammates(slot, currentCycleOffset, id);
+
+        const tr = document.createElement('tr');
+        if (slot.id === 9) tr.className = 'is-current';
+        tr.innerHTML = `
+          <td><span class="num">#${slot.id + 1}</span> <span class="meta">${esc(slot.group)}</span></td>
+          <td>${esc(slot.title)}</td>
+          <td><span class="freq-chip ${freqChipClass(slot.freqType)}">${esc(slot.freqCn)}</span></td>
+          <td><button class="link-jump-duty" onclick="selectMemberAndOpenDuty('${id}')">${esc(MEMBERS[id].name)}</button></td>
+          <td><button class="link-jump-duty" onclick="selectMemberAndOpenDuty('${nextId}')">${esc(MEMBERS[nextId].name)}</button></td>
+          <td class="meta">${mates.length ? esc(mates.join('、')) : '—'}</td>
+          <td class="meta">${esc(slot.focus)}</td>
+          <td>
+            <button class="btn btn-secondary btn-pill-compact" onclick="selectMemberAndOpenDuty('${id}')">查看 Duty</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 6.（原「支撑模块」：告罄白板 / 签名存根 / 插枪头进度）
+     *     —— 已按 Roadmap 移出本期实现，详见 docs/roadmap.md
+     * ───────────────────────────────────────────────────────────── */
+
+    /* ─────────────────────────────────────────────────────────────
+     * 7. 渲染：成员 Duty 专页
+     * ───────────────────────────────────────────────────────────── */
+    function renderPersonalDutyView(memberId) {
+      const data = MEMBERS[memberId] || MEMBERS.M01;
+      const slotId = getSlotIdForMember(memberId, currentCycleOffset);
+      const slot = ROSTER_SLOTS[slotId];
+      const nextSlotId = (slotId + 1) % MEMBER_COUNT;
+      const nextSlot = ROSTER_SLOTS[nextSlotId];
+      const status = getMemberStatus(slot, currentCycleOffset);
+      const mates = getTeammates(slot, currentCycleOffset, memberId);
+
+      // 顶栏快捷胶囊
+      document.getElementById('top-user-avatar').textContent = data.name.charAt(0);
+      document.getElementById('top-user-name').textContent = `${data.name} · ${navTagForSlot(slot)}`;
+
+      // Hero
+      document.getElementById('duty-avatar-box').textContent = data.name.charAt(0);
+      document.getElementById('duty-name-display').textContent = data.name;
+      document.getElementById('duty-role-title').textContent = `${data.domain} · ${data.roleTitle}`;
+
+      const badge = document.getElementById('duty-status-badge');
+      badge.textContent = status.text;
+      badge.className = `profile-status-badge ${status.cls}`;
+
+      document.getElementById('duty-fixed-meta').textContent = data.domain;
+      document.getElementById('duty-slot-meta').textContent = slot.short;
+      document.getElementById('duty-freq-meta').textContent = slot.freqCn;
+      document.getElementById('duty-next-meta').textContent = `#${nextSlotId + 1} ${nextSlot.short}`;
+
+      // 职责标签
+      const certs = document.getElementById('duty-certs-container');
+      certs.innerHTML = '';
+      [data.domain, slot.freqCn, slot.group, '周一 / 周四库存盘点', currentCycleOffset < 0 ? '筹备期' : `第 ${currentCycleOffset + 1} 周期在岗`]
+        .forEach(t => {
+          const s = document.createElement('span');
+          s.className = 'cert-chip';
+          s.textContent = t;
+          certs.appendChild(s);
+        });
+
+      // SOP（随岗位轮转）
+      document.getElementById('duty-sop-count').textContent = `${slot.sop.length} 项核心专责规程`;
+      const sopList = document.getElementById('duty-sop-list');
+      sopList.innerHTML = '';
+      slot.sop.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'sop-item';
+        item.innerHTML = `
+          <div class="sop-header">
+            <span class="sop-title">${esc(s.title)}</span>
+            <span class="sop-tag">${esc(s.tag)}</span>
+          </div>
+          <p class="sop-desc">${esc(s.desc)}</p>
+          <div class="sop-spec">执行规范：${esc(s.spec)}</div>
+        `;
+        sopList.appendChild(item);
+      });
+
+      // 固定责任区与专管物资（常态化分工）
+      document.getElementById('duty-inst-count').textContent = `${data.assets.length} 项责任区`;
+      const instList = document.getElementById('duty-instruments-list');
+      instList.innerHTML = '';
+      data.assets.forEach(a => {
+        const d = document.createElement('div');
+        d.className = 'instrument-card-item';
+        d.innerHTML = `
+          <div>
+            <div class="inst-name">${esc(a.name)}</div>
+            <div class="inst-model">${esc(a.model)}</div>
+          </div>
+          <span class="inst-status-tag ${a.statusType === 'good' ? 'inst-good' : 'inst-warn'}">${esc(a.status)}</span>
+        `;
+        instList.appendChild(d);
+      });
+
+      // 备注：固定职责说明 + 交接备忘
+      document.getElementById('duty-personal-memo-box').innerHTML = `
+        <strong>固定职责说明：</strong>${esc(data.fixedDetails)}<br/>
+        <strong>交接备忘摘录：</strong>${esc(data.memo)}
+      `;
+
+      // 11 期轮转时间轴
+      const tl = document.getElementById('duty-timeline-steps');
+      tl.innerHTML = '';
+      for (let step = 0; step < MEMBER_COUNT; step++) {
+        const off = currentCycleOffset + step;
+        const sId = getSlotIdForMember(memberId, off);
+        const s = ROSTER_SLOTS[sId];
+        const isCurrent = step === 0;
+        const el = document.createElement('div');
+        el.className = `step-item ${isCurrent ? 'current' : ''}`;
+        el.innerHTML = `
+          <div>
+            <span class="step-badge">${isCurrent ? '本周期在岗' : `第 ${off + 1} 周期`} · 岗位 #${sId + 1}</span>
+            <div class="step-date">${esc(s.short)}</div>
+            <p class="step-remark">${esc(getCycleDateRange(off))}<br/>频次：${esc(s.freqCn)} · 焦点：${esc(s.focus)}</p>
+          </div>
+          ${isCurrent ? '<div style="margin-top: 8px; font-size: 10px; font-weight: 600; color: var(--accent);">● 当前焦点节点</div>' : ''}
+        `;
+        tl.appendChild(el);
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 8. 视图切换
+     * ───────────────────────────────────────────────────────────── */
+    function switchMainView(view) {
+      currentMainView = view;
+      const rosterView = document.getElementById('view-roster');
+      const dutyView = document.getElementById('view-duty');
+      const btnRoster = document.getElementById('btn-seg-roster');
+      const btnDuty = document.getElementById('btn-seg-duty');
+
+      if (view === 'roster') {
+        rosterView.style.display = 'block';
+        dutyView.style.display = 'none';
+        btnRoster.classList.add('active');
+        btnDuty.classList.remove('active');
+      } else {
+        rosterView.style.display = 'none';
+        dutyView.style.display = 'block';
+        btnRoster.classList.remove('active');
+        btnDuty.classList.add('active');
+        renderPersonalDutyView(currentActiveMemberId);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectMemberAndOpenDuty(memberId) {
+      currentActiveMemberId = memberId;
+      renderMemberSelectorPills();
+      renderPersonalDutyView(memberId);
+      switchMainView('duty');
+      showToast(`已加载 ${MEMBERS[memberId].name} 的专属 Duty 职责页面`);
+    }
+
+    function toggleRosterSubtab(mode) {
+      activeRosterSubtab = mode;
+      const grid = document.getElementById('slot-card-grid');
+      const table = document.getElementById('rotation-table-view');
+      const btnSlots = document.getElementById('tab-slots-btn');
+      const btnTable = document.getElementById('tab-table-btn');
+
+      if (mode === 'slots') {
+        grid.style.display = 'grid';
+        table.style.display = 'none';
+        btnSlots.classList.add('active');
+        btnTable.classList.remove('active');
+      } else {
+        grid.style.display = 'none';
+        table.style.display = 'block';
+        btnSlots.classList.remove('active');
+        btnTable.classList.add('active');
+        showToast('已切换至轮换总览大表');
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 9. 周期导航
+     * ───────────────────────────────────────────────────────────── */
+    function renderAllRoster() {
+      renderEnvChip();
+      renderCycleToolbar();
+      renderBillboardLead();
+      renderMemberSelectorPills();
+      renderSlotCards();
+      renderRotationTable();
+    }
+
+    function changeCycle(delta) {
+      currentCycleOffset += delta;
+      renderAllRoster();
+      if (currentMainView === 'duty') renderPersonalDutyView(currentActiveMemberId);
+      showToast(`已切换至 ${getCycleLabel(currentCycleOffset)}`);
+    }
+    function resetCycle() {
+      currentCycleOffset = getInitialCycleOffset();
+      renderAllRoster();
+      if (currentMainView === 'duty') renderPersonalDutyView(currentActiveMemberId);
+      showToast('已回到首期（Day 1 起始周期）');
+    }
+    function onDatePickerChange(val) {
+      if (!val) return;
+      currentCycleOffset = getCycleOffsetFromDate(new Date(val + 'T00:00:00'));
+      renderAllRoster();
+      if (currentMainView === 'duty') renderPersonalDutyView(currentActiveMemberId);
+      showToast(`已跳转至 ${getCycleLabel(currentCycleOffset)}`);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 10. 模态：Day 1 基准配置
+     *     （原告罄登记、签名确认、原始规约表存档三个模态均已移出）
+     * ───────────────────────────────────────────────────────────── */
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function openDay1Modal() {
+      const cur = getSavedDay1Date();
+      document.getElementById('custom-day1-date').value = cur;
+      document.getElementById('preset-oct12').checked = (cur === '2026-10-12');
+      document.getElementById('preset-oct19').checked = (cur === '2026-10-19');
+      openModal('day1-modal');
+    }
+    function closeDay1Modal() { closeModal('day1-modal'); }
+    function onDay1PresetSelect(v) { document.getElementById('custom-day1-date').value = v; }
+    function onCustomDay1DateChange(v) {
+      document.getElementById('preset-oct12').checked = (v === '2026-10-12');
+      document.getElementById('preset-oct19').checked = (v === '2026-10-19');
+    }
+    function saveDay1Setting() {
+      const v = document.getElementById('custom-day1-date').value;
+      if (!v) return;
+      LS.setItem(STORAGE_KEY_DAY1, v);
+      BASE_START_DATE = new Date(v + 'T00:00:00');
+      currentCycleOffset = getInitialCycleOffset();
+
+      const picker = document.getElementById('date-picker-input');
+      const now = new Date();
+      picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+      renderAllRoster();
+      if (currentMainView === 'duty') renderPersonalDutyView(currentActiveMemberId);
+      closeDay1Modal();
+      showToast(`Day 1 已更新为 ${v}，全部轮换周期已重新计算`);
+    }
+
+    function openPrintHint() { window.print(); }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 11. Toast
+     * ───────────────────────────────────────────────────────────── */
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('app-toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.add('visible');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 12. Bootstrap
+     * ───────────────────────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      currentCycleOffset = getInitialCycleOffset();
+
+      const picker = document.getElementById('date-picker-input');
+      const now = new Date();
+      picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+      renderAllRoster();
+      renderPersonalDutyView('M01');
+
+      // 点击遮罩关闭模态
+      ['day1-modal'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('click', ev => { if (ev.target === el) el.classList.remove('active'); });
+      });
+      // Esc 关闭模态
+      document.addEventListener('keydown', ev => {
+        if (ev.key === 'Escape') {
+          ['day1-modal'].forEach(id => closeModal(id));
+        }
+      });
+
+      // 首屏筹备期提示
+      const dayDiff = Math.floor((now.getTime() - BASE_START_DATE.getTime()) / 86400000);
+      if (dayDiff < 0) {
+        setTimeout(() => showToast(`距 Day 1（${getSavedDay1Date()}）正式启动还有 ${Math.abs(dayDiff)} 天，当前展示甲组初始排班`), 600);
+      }
+    });
+  </script>
+</body>
+</html>
