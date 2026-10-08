@@ -75,4 +75,4 @@ python3 -m http.server 8080
 
 ## 许可
 
-尚未指定许可证。如需他人复用，请补充 `LICENSE`（例如 MIT）。
+本项目采用 [MIT License](LICENSE)。
