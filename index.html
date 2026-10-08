@@ -899,17 +899,7 @@
     .sop-title { font-size: var(--text-base); font-weight: 600; color: var(--fg); }
     .sop-tag { font-size: 11px; font-family: var(--font-mono); color: var(--muted); }
     .sop-desc { font-size: var(--text-sm); color: var(--fg-2); line-height: 1.5; }
-    .sop-spec {
-      margin-top: var(--space-2);
-      padding: var(--space-2) var(--space-3);
-      background: rgba(0, 0, 0, 0.03);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-xs);
-      color: var(--muted);
-      font-family: var(--font-mono);
-    }
-
-    /* Dedicated Instruments / Assigned Zone */
+    /* 固定责任人分工（规约表「责任内容」栏原文） */
     .instrument-card-item {
       display: flex;
       align-items: center;
@@ -921,17 +911,6 @@
     .instrument-card-item:last-child { border-bottom: none; }
     .inst-name { font-weight: 600; font-size: var(--text-sm); color: var(--fg); }
     .inst-model { font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono); }
-    .inst-status-tag {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: var(--radius-pill);
-      font-weight: 500;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .inst-good { background: rgba(22, 163, 74, 0.1); color: var(--success); }
-    .inst-warn { background: rgba(234, 179, 8, 0.15); color: #b45309; }
-
     /* Personal Timeline & Shift History */
     .personal-timeline-card {
       background: var(--bg);
@@ -1145,7 +1124,7 @@
         <div>
           <p class="eyebrow" style="margin-bottom: 2px;">LABORATORY MEMBERS · 实验室成员轮值序列</p>
           <p style="font-size: var(--text-sm); color: var(--muted);">
-            点击任意成员即可直接进入其专属 Duty 职责页面，查看其固定责任区、专管物资与 11 期轮转轨迹
+            点击任意成员即可直接进入其专属 Duty 职责页面，查看其固定分工与 11 期轮转轨迹
           </p>
         </div>
       </div>
@@ -1227,7 +1206,7 @@
               </div>
               <div class="rule-item">
                 <span class="rule-dot"></span>
-                <span class="rule-text"><strong>频次分层</strong>：每日岗 2 人（抽湿机水箱早晚各 1 次）、每周岗 2 人（灭菌 / 耗材补充）、每 2 周岗 7 人（三区清洁）。</span>
+                <span class="rule-text"><strong>频次分层</strong>：每日岗 2 人、每周岗 2 人、每 2 周岗 7 人（人数取自规约表频次栏括号内数字）。</span>
               </div>
             </div>
           </div>
@@ -1267,12 +1246,11 @@
               <thead>
                 <tr>
                   <th>岗位</th>
-                  <th>岗位职责内容</th>
+                  <th>值日内容</th>
                   <th>频次</th>
                   <th>本周期当值</th>
                   <th>下周期接替</th>
                   <th>协同成员</th>
-                  <th>专责焦点领域</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -1296,15 +1274,15 @@
           <div class="rules-grid">
             <div class="rule-item">
               <span class="rule-dot"></span>
-              <span class="rule-text"><strong>清洁时间窗口</strong>：每个月第一个 / 第三个礼拜内完成全套打扫清洁。</span>
+              <span class="rule-text"><strong>清洁时间窗口</strong>：每个月第一个 / 第三个礼拜内完成打扫清洁。</span>
             </div>
             <div class="rule-item">
               <span class="rule-dot"></span>
-              <span class="rule-text"><strong>枪头插盒指标</strong>：每周每人插枪头 ≥ 10 盒，按各规格消耗量灵活安排。</span>
+              <span class="rule-text"><strong>枪头插盒指标</strong>：每周每人插枪头 ≥10 盒，根据每种枪头消耗量灵活安排枪头类型。</span>
             </div>
             <div class="rule-item">
               <span class="rule-dot"></span>
-              <span class="rule-text"><strong>库存核查频次</strong>：固定责任人每周检查库存 2 次（周一 Mon / 周四 Thu）。</span>
+              <span class="rule-text"><strong>库存核查频次</strong>：检查库存每周 2 次（Mon / Thu）。</span>
             </div>
           </div>
         </div>
@@ -1326,13 +1304,13 @@
           <div class="profile-name-row">
             <h1 class="profile-title" id="duty-name-display">H.W.Y</h1>
             <span class="profile-status-badge badge-on-duty" id="duty-status-badge">每周在岗执行</span>
-            <span class="meta" id="duty-role-title">分子生物学 · 公用分子试剂主管</span>
+            <span class="meta" id="duty-role-title">固定分工：订购、管理公用分子试剂</span>
           </div>
 
           <div class="profile-meta-grid">
-            <span class="profile-meta-item">固定分工：<strong id="duty-fixed-meta">公用分子试剂</strong></span>
-            <span class="profile-meta-item">本周期岗位：<strong id="duty-slot-meta">枪头与 ddH₂O 灭菌</strong></span>
+            <span class="profile-meta-item">本周期岗位：<strong id="duty-slot-meta">各规格枪头灭菌烘干、ddH2O灭菌（至少周内够用）</strong></span>
             <span class="profile-meta-item">执行频次：<strong id="duty-freq-meta">每周 1 次</strong></span>
+            <span class="profile-meta-item">当值人数：<strong id="duty-team-meta">1 人</strong></span>
             <span class="profile-meta-item">下期岗位：<strong id="duty-next-meta">打扫实验室</strong></span>
           </div>
 
@@ -1358,12 +1336,12 @@
         <div class="card" style="padding: var(--space-6);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
             <div>
-              <h2 style="font-size: var(--text-xl); font-weight: 600;">本周期值日专责规程与执行标准</h2>
+              <h2 style="font-size: var(--text-xl); font-weight: 600;">本周期值日专责规程</h2>
               <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
-                规程随岗位轮转变化 · 明确责任边界与执行标准（SOP 规范）
+                规程随岗位轮转变化 · 逐字引自规约表「区域打扫内容」，未单列清单的岗位不作补写
               </p>
             </div>
-            <span class="meta" id="duty-sop-count">3 项核心专责</span>
+            <span class="meta" id="duty-sop-count">6 项</span>
           </div>
 
           <div id="duty-sop-list">
@@ -1371,29 +1349,20 @@
           </div>
         </div>
 
-        <!-- Right: Fixed responsibility zone & dedicated assets -->
+        <!-- Right: Fixed responsibility (verbatim from 责任内容 column) -->
         <div class="card" style="padding: var(--space-6);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
             <div>
-              <h2 style="font-size: var(--text-xl); font-weight: 600;">固定责任区与专管物资</h2>
+              <h2 style="font-size: var(--text-xl); font-weight: 600;">固定责任人分工</h2>
               <p style="font-size: var(--text-xs); color: var(--muted); margin-top: 2px;">
-                常态化分工，每周一 / 周四定期盘点核验
+                逐字引自规约表「责任内容」栏 · 检查库存每周 2 次（Mon / Thu）
               </p>
             </div>
-            <span class="meta" id="duty-inst-count">2 项责任区</span>
+            <span class="meta" id="duty-inst-count">1 条</span>
           </div>
 
           <div id="duty-instruments-list">
             <!-- Populated dynamically -->
-          </div>
-
-          <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-soft);">
-            <h3 style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2);">
-              个人交接备忘
-            </h3>
-            <div id="duty-personal-memo-box" style="padding: var(--space-3); background: var(--surface); border-radius: var(--radius-md); font-size: var(--text-xs); color: var(--fg-2); line-height: 1.5;">
-              <!-- Populated dynamically -->
-            </div>
           </div>
         </div>
 
@@ -1502,199 +1471,78 @@
       { id: 'M11', name: 'Y.S.Y' }
     ];
 
-    // 区域清洁 SOP（原始规约表第三部分）
+    /* 数据来源与保真原则（重要）
+     * 本文件的数据全部**逐字引自实验室原始规约表**（截图存档）：
+     *   ① 「责任人分工」表的「责任内容」一列
+     *   ② 「值日 roster」表的「值日内容」与「频次」一列
+     *   ③ 「区域打扫内容」的三份清单（细胞房 / 实验室 / 休息室）
+     * 仅有以下派生信息由上述记载计算得出，不引入任何新事实：
+     *   · 当值人数（原文频次栏括号内数字，如 (3) 表示 3 人）
+     *   · 轮换位置、周期序号与日期区间
+     * 规约表未记载的内容一律留空，或明确标注「规约表未定义」，不作补写。 */
+
+    // ③ 区域打扫内容（逐字引用）
     const SOP_CELL = [
-      { title: '安全柜内壁与器械擦拭并照紫外', tag: '细胞房 SOP · 台面级', desc: '清理、擦拭安全柜内部、所有移液枪与 Racks，每次处理 1 个台面后照紫外灭菌。', spec: '标准：操作前后各照紫外，台面无残留培养液与粉尘' },
-      { title: '桌面、仪器与培养箱表面清洁', tag: '细胞房 SOP · 仪器级', desc: '清理并擦拭桌面，以及离心机、计数仪、显微镜和 CO₂ 培养箱表面。', spec: '标准：仪器缝隙与把手无污渍，培养箱内壁无水渍霉斑' },
-      { title: '扫地并以 84 消毒液拖地', tag: '细胞房 SOP · 地面级', desc: '扫地后用 84 消毒液拖地，结束后照紫外 2h 并关闭紫外灯。', spec: '标准：消毒液按规定稀释 · 紫外累计 2h 后必须关闭' },
-      { title: '更换细胞房水浴锅水', tag: '细胞房 SOP · 液体级', desc: '排空并更换细胞房水浴锅用水，避免水垢与微生物滋生。', spec: '标准：换水后水位在刻度区间，锅体无霉斑' },
-      { title: '防护服清洗晾干并照紫外', tag: '细胞房 SOP · 防护用品', desc: '防护服洗并晾干，照紫外，分 2 批，每轮洗一批。', spec: '标准：每轮仅清洗一批，确保照紫外充分' },
-      { title: '清洗拖鞋', tag: '细胞房 SOP · 防护用品', desc: '清洗细胞房专用拖鞋，保持洁净并晾干归位。', spec: '标准：拖鞋无污渍异味，按位摆放' }
+      '清理、擦拭安全柜内部，所有枪，Racks，照紫外（每次1个台）',
+      '清理、擦拭桌面、仪器（离心机、计数仪、显微镜）和培养箱表面',
+      '扫地并用84消毒液拖地，结束后照紫外2h并关闭紫外',
+      '换细胞房水浴锅水',
+      '防护服洗并晾干，照紫外，分2批，每轮洗一批',
+      '洗拖鞋'
     ];
     const SOP_LAB = [
-      { title: '清理公共实验桌面并拖地', tag: '实验室 SOP · 台面与地面', desc: '清理公共实验桌面，保持干燥整齐，地面彻底拖洗干净。', spec: '标准：台面物品按类归位，地面无试剂残留' },
-      { title: '冰箱清霜', tag: '实验室 SOP · 低温设备', desc: '对公共冰箱进行清霜与规整，避免积霜影响温控效率。', spec: '标准：霜层厚度控制在合理范围，箱内样品标签清晰' },
-      { title: '水浴锅换水', tag: '实验室 SOP · 液体级', desc: '更换公共水浴锅用水，清洁锅底沉积物。', spec: '标准：换水后温控稳定，锅底无沉淀结垢' },
-      { title: '整理货架（包括洗衣机房间）', tag: '实验室 SOP · 内务', desc: '整理公用货架物资，含洗衣机房间的分类与堆叠。', spec: '标准：货架分区清晰，通道保持畅通' }
+      '清理桌面，拖地',
+      '冰箱清霜',
+      '水浴锅换水',
+      '整理货架（包括洗衣机房间）'
     ];
     const SOP_LOUNGE = [
-      { title: '清理休息室冰箱', tag: '休息室 SOP · 低温设备', desc: '清理休息室冰箱，清除过期或无标记食品，擦拭隔板去除异味。', spec: '标准：无过期食品残留，隔板洁净无异味' },
-      { title: '休息室拖地', tag: '休息室 SOP · 地面', desc: '彻底清扫并拖净休息室地面，清倒垃圾桶并更换垃圾袋。', spec: '标准：地面洁净无水渍，垃圾桶已套新袋' }
-    ];
-    const SOP_STERILIZE = [
-      { title: '各规格枪头高压灭菌与烘干', tag: '灭菌保障 · 每周', desc: '各规格枪头装盒后行高压灭菌，灭菌完成后烘干备用。', spec: '标准：121℃ / 20min 灭菌，化学指示胶带完全变色' },
-      { title: 'ddH₂O 制备与灭菌', tag: '灭菌保障 · 每周', desc: '制备超纯水并高压灭菌，分装存放供全组使用。', spec: '标准：超纯水电阻率 18.2 MΩ·cm，灭菌水 4℃ 存放' },
-      { title: '周内用量存量保障', tag: '灭菌保障 · 盘点', desc: '盘点枪头与 ddH₂O 存量，确保至少周内够用。', spec: '标准：存量低于周用量阈值时立即补制' }
-    ];
-    const SOP_SUPPLY = [
-      { title: '细胞房 working stock 补充', tag: '耗材补充 · 每周', desc: '补充细胞房内各种常用耗材，填满 working stock。', spec: '标准：加样槽、培养皿、离心管等常用项无空缺' },
-      { title: '耗材余量盘点与申购联动', tag: '耗材补充 · 盘点', desc: '盘点细胞房耗材余量，不足项登记至告罄白板并联动申购。', spec: '标准：临期缺货项 24h 内完成白板登记' }
-    ];
-    const SOP_DEHUMID = [
-      { title: '每天倒细胞房抽湿机水箱 2 次', tag: '日常维护 · 每天 2 次', desc: '每天早、晚各倒 1 次细胞房抽湿机水箱，避免溢水停机。', spec: '标准：水箱水位不超过 2/3，地面无溢水痕迹' },
-      { title: '抽湿机运行状态与恒湿环境检查', tag: '日常维护 · 巡检', desc: '检查抽湿机运行状态与细胞房湿度，确保恒湿环境稳定。', spec: '标准：设备连续运行无报警，湿度处于设定区间' }
+      '清理冰箱',
+      '拖地'
     ];
 
-    // 11 个岗位槽位（岗位职责内容与频次 1:1 还原原始规约表）
+    // ② 11 个岗位槽位：值日内容 / 频次 / 当值人数（逐字引用 + 计数派生）
     const ROSTER_SLOTS = [
-      { id: 0,  title: '各规格枪头灭菌烘干、ddH₂O 灭菌（至少周内够用）', short: '枪头与 ddH₂O 灭菌',
-        freq: 'Every week', freqCn: '每周 1 次', freqType: 'weekly', group: '灭菌保障组', mates: [0],
-        focus: '灭菌存量与无菌保障', sop: SOP_STERILIZE,
-        desc: '负责各规格枪头高压灭菌烘干与 ddH₂O 制备灭菌，保障全组周内用量。' },
-      { id: 1,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
-        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
-        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
-      { id: 2,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
-        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
-        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
-      { id: 3,  title: '打扫实验室', short: '打扫实验室（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '实验室保洁组', mates: [1, 2, 3],
-        focus: '公共实验区清洁与设备除霜', sop: SOP_LAB,
-        desc: '公共实验区桌面拖地、冰箱清霜、水浴锅换水、货架与洗衣机房整理。' },
-      { id: 4,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
-        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
-        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
-      { id: 5,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
-        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
-        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
-      { id: 6,  title: '清洁细胞房', short: '清洁细胞房（3 人合力）',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '细胞房清洁组', mates: [4, 5, 6],
-        focus: '细胞房无菌环境与紫外消毒', sop: SOP_CELL,
-        desc: '安全柜与仪器擦拭照紫外、84 消毒拖地并紫外 2h、换水浴锅水、防护服分批清洗、洗拖鞋。' },
-      { id: 7,  title: '打扫休息室', short: '打扫休息室',
-        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次', freqType: 'biweekly', group: '休息室保洁组', mates: [7],
-        focus: '休息区卫生与冰箱清理', sop: SOP_LOUNGE,
-        desc: '休息室冰箱清理与地面拖洗，清倒垃圾并更换垃圾袋。' },
-      { id: 8,  title: '补充细胞房内各种常用耗材，填满 working stock', short: '细胞房耗材补充',
-        freq: 'Every week', freqCn: '每周 1 次', freqType: 'weekly', group: '细胞房耗材组', mates: [8],
-        focus: '细胞房耗材 working stock 补足', sop: SOP_SUPPLY,
-        desc: '定期检查细胞房耗材余量，及时补齐加样槽、培养皿、离心管等 working stock。' },
-      { id: 9,  title: '每天倒细胞房抽湿机水箱 2 次', short: '倒抽湿机水箱（2 人轮值）',
-        freq: 'Every day', freqCn: '每天 2 次', freqType: 'daily', group: '抽湿机日常维护', mates: [9, 10],
-        focus: '抽湿机恒湿环境维护', sop: SOP_DEHUMID,
-        desc: '每天早 / 晚各倒 1 次细胞房抽湿机水箱，避免溢水停机，保持恒湿环境。' },
-      { id: 10, title: '每天倒细胞房抽湿机水箱 2 次', short: '倒抽湿机水箱（2 人轮值）',
-        freq: 'Every day', freqCn: '每天 2 次', freqType: 'daily', group: '抽湿机日常维护', mates: [9, 10],
-        focus: '抽湿机恒温恒湿环境维护', sop: SOP_DEHUMID,
-        desc: '每天早 / 晚各倒 1 次细胞房抽湿机水箱，避免溢水停机，保持恒湿环境。' }
+      { id: 0,  title: '各规格枪头灭菌烘干、ddH2O灭菌（至少周内够用）', navTag: '枪头与 ddH₂O 灭菌',
+        freq: 'Every week',    freqCn: '每周 1 次',     freqType: 'weekly',   teamSize: 1, mates: [0],        sop: [],         sopSource: null },
+      { id: 1,  title: '打扫实验室', navTag: '打扫实验室',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [1, 2, 3],  sop: SOP_LAB,    sopSource: '实验室打扫内容' },
+      { id: 2,  title: '打扫实验室', navTag: '打扫实验室',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [1, 2, 3],  sop: SOP_LAB,    sopSource: '实验室打扫内容' },
+      { id: 3,  title: '打扫实验室', navTag: '打扫实验室',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [1, 2, 3],  sop: SOP_LAB,    sopSource: '实验室打扫内容' },
+      { id: 4,  title: '清洁细胞房', navTag: '清洁细胞房',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [4, 5, 6],  sop: SOP_CELL,   sopSource: '细胞房打扫内容' },
+      { id: 5,  title: '清洁细胞房', navTag: '清洁细胞房',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [4, 5, 6],  sop: SOP_CELL,   sopSource: '细胞房打扫内容' },
+      { id: 6,  title: '清洁细胞房', navTag: '清洁细胞房',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 3, mates: [4, 5, 6],  sop: SOP_CELL,   sopSource: '细胞房打扫内容' },
+      { id: 7,  title: '打扫休息室', navTag: '打扫休息室',
+        freq: 'Every 2 weeks', freqCn: '每 2 周 1 次',  freqType: 'biweekly', teamSize: 1, mates: [7],        sop: SOP_LOUNGE, sopSource: '休息室打扫内容' },
+      { id: 8,  title: '补充细胞房内各种常用耗材，填满 working stock', navTag: '补充细胞房耗材（working stock）',
+        freq: 'Every week',    freqCn: '每周 1 次',     freqType: 'weekly',   teamSize: 1, mates: [8],        sop: [],         sopSource: null },
+      { id: 9,  title: '每天倒细胞房抽湿机水箱 2 次', navTag: '倒细胞房抽湿机水箱',
+        freq: 'Every day',     freqCn: '每天 2 次',     freqType: 'daily',    teamSize: 2, mates: [9, 10],    sop: [],         sopSource: null },
+      { id: 10, title: '每天倒细胞房抽湿机水箱 2 次', navTag: '倒细胞房抽湿机水箱',
+        freq: 'Every day',     freqCn: '每天 2 次',     freqType: 'daily',    teamSize: 2, mates: [9, 10],    sop: [],         sopSource: null }
     ];
 
-    // 11 位成员的个人档案（长期固定分工 + 专管物资 / 责任区 + 交接备忘）
+    // ① 11 位成员的固定分工：仅记录「责任内容」栏原文
+    // fixedItems 仅在原文以括号枚举时提取（M10 / M11 两处），其余留空
     const MEMBERS = {
-      M01: {
-        name: 'H.W.Y', domain: '分子生物学', roleTitle: '公用分子试剂主管',
-        fixedContent: '订购、管理公用分子试剂',
-        fixedDetails: '负责公用酶类、PCR 试剂盒、质粒提取 Kit、DNA/RNA Marker、引物等订购与库存盘点。',
-        assets: [
-          { name: '公用分子试剂冷柜', model: '酶类 / PCR 试剂盒 · 4℃ 分区', status: '库存正常', statusType: 'good' },
-          { name: '引物与 DNA Marker 台账', model: '订购与领用登记 · 周盘点', status: '台账齐全', statusType: 'good' }
-        ],
-        memo: '公用分子试剂冷柜已按酶类 / 试剂盒分区整理，引物合成单已归档；下批引物到货后请按标签入格。',
-      },
-      M02: {
-        name: 'X.Z', domain: '财务与公账', roleTitle: '实验室公账与报销主管',
-        fixedContent: '日常报销、实验室公账管理',
-        fixedDetails: '负责发票审核报销、课题组公账台账登记、实验经费对账与财务统筹。',
-        assets: [
-          { name: '实验室公账与报销台账', model: '发票审核 · 月度对账', status: '月度已对账', statusType: 'good' },
-          { name: '发票与采购合同归档', model: '纸质 + 电子双份归档', status: '待整理归档', statusType: 'warn' }
-        ],
-        memo: '本月发票已提交报销流程，试剂采购合同待归档入册，请相关同学补齐签收单后交予我对账。',
-      },
-      M03: {
-        name: 'L.L.Q', domain: '动物实验', roleTitle: '动物实验物资主管',
-        fixedContent: '订购、管理动物实验公共试剂药品',
-        fixedDetails: '负责动物麻醉药品、手术器械包、动物房耗材、消毒杀菌试剂申领与台账管理。',
-        assets: [
-          { name: '动物实验药品柜', model: '麻醉剂 / 药品 · 双人登记', status: '双人登记执行中', statusType: 'good' },
-          { name: '手术器械与动物房耗材', model: '器械包 / 垫料 / 消毒剂', status: '库存正常', statusType: 'good' }
-        ],
-        memo: '动物实验药品柜严格执行双人登记领用；手术器械包已灭菌归位，动物房垫料库存充足。',
-      },
-      M04: {
-        name: 'Y.J.X', domain: '环保与安全', roleTitle: '废弃物与危化回收主管',
-        fixedContent: '清理空瓶、锐器盒、门外垃圾桶并按学校通知定期回收',
-        fixedDetails: '负责化学空瓶规范回收、锐器盒封箱、危化废液申报及实验区外部垃圾桶清运。',
-        assets: [
-          { name: '化学空瓶暂存区', model: '按学校通知定期集中回收', status: '待集中回收', statusType: 'warn' },
-          { name: '锐器盒与危废暂存柜', model: '密封封箱 · 台账登记', status: '封装正常', statusType: 'good' }
-        ],
-        memo: '化学空瓶已分类暂存，待学校回收通知；锐器盒请勿超过标示容量线，满盒后交由我封箱登记。',
-      },
-      M05: {
-        name: 'G.R.Q', domain: '资产与设备', roleTitle: '仪器维修与资产主管',
-        fixedContent: '机动项目，如仪器维修、仪器购买和资产入账等',
-        fixedDetails: '负责离心机 / 显微镜 / 超纯水等仪器报修报维、新购仪器论证、固定资产条码入账。',
-        assets: [
-          { name: '大型仪器资产台账', model: '固定资产条码与档案', status: '台账完整', statusType: 'good' },
-          { name: '报修与维保工单', model: '报修受理 · 厂家联络', status: '1 单处理中', statusType: 'warn' }
-        ],
-        memo: '在修仪器工单已跟进厂家；新到仪器请及时告知我完成资产条码入账，避免漏登。',
-      },
-      M06: {
-        name: 'G.R', domain: '流式与免疫', roleTitle: '流式抗体与细胞因子主管',
-        fixedContent: '订购、管理公用流式抗体、细胞因子',
-        fixedDetails: '负责荧光单克隆抗体、分选试剂盒、重组蛋白细胞因子库存监控与冷链避光保存。',
-        assets: [
-          { name: '流式抗体 4℃ 避光柜', model: '荧光单抗 · 避光分区', status: '冷链正常', statusType: 'good' },
-          { name: '细胞因子 -20℃ 库', model: '重组蛋白 · 分装冻存', status: '分装规范', statusType: 'good' }
-        ],
-        memo: '流式抗体请严格避光并及时回 4℃；细胞因子分装冻存后避免反复冻融，用完请告知我登记。',
-      },
-      M07: {
-        name: 'Z.Y.H', domain: '网络与 IT', roleTitle: '实验室网络与数字资产主管',
-        fixedContent: '实验室网络资源管理及维护',
-        fixedDetails: '维护实验室局域网、NAS 存储备份、服务器、仪器工作站网络联通及公共文献账号。',
-        assets: [
-          { name: '实验室局域网与路由', model: '内网 / 无线 · 运行监控', status: '运行中', statusType: 'good' },
-          { name: 'NAS 数据备份中心', model: '共享盘 · 定期备份', status: '容量 78%', statusType: 'warn' }
-        ],
-        memo: 'NAS 容量已近八成，请各位及时清理临时数据；文献下载账号异常请第一时间联系我排查。',
-      },
-      M08: {
-        name: 'L.Y.Y', domain: '细胞培养基', roleTitle: '血清与培养基主管',
-        fixedContent: '订购、管理公用血清、培养基',
-        fixedDetails: '负责胎牛血清（FBS）批次测试与订购、DMEM / 1640 培养基、双抗及各类添加剂库存。',
-        assets: [
-          { name: 'FBS 胎牛血清 -20℃ 库', model: '批次记录 · 分装冻存', status: '库存偏低', statusType: 'warn' },
-          { name: '培养基与双抗', model: 'DMEM / 1640 / 双抗', status: '库存正常', statusType: 'good' }
-        ],
-        memo: '血清库存偏低，已提交采购申请；新批次血清到货后需先做批次测试再全量投入使用。',
-      },
-      M09: {
-        name: 'Z.L.D', domain: '气瓶与低温', roleTitle: '气体与液氮储备主管',
-        fixedContent: '订购、管理二氧化碳 / 氮气气瓶和液氮补充',
-        fixedDetails: '负责 CO₂ 气瓶减压阀巡检、液氮罐液位检测、定期联系供应商加气与灌充液氮。',
-        assets: [
-          { name: 'CO₂ / N₂ 汇流排气瓶', model: '减压阀压力巡检', status: '压力正常', statusType: 'good' },
-          { name: '液氮罐', model: '液位检测 · 定期灌充', status: '液位 62%', statusType: 'good' }
-        ],
-        memo: '气瓶压力表读数正常，液氮罐液位 62% 属于安全区间；液位低于 40% 时请提醒我安排灌充。',
-      },
-      M10: {
-        name: 'J.Y', domain: '细胞耗材', roleTitle: '细胞耗材与消毒剂主管',
-        fixedContent: '订购、管理 T25 / T75 / T175、10cm 皿、6 孔板、12 孔板、加样槽、15ml 管、50ml 管、细胞冻存管、75% 酒精等',
-        fixedDetails: '全面负责细胞房塑料耗材供应链保障，并负责 75% 医用酒精的调配与补给。',
-        assets: [
-          { name: '细胞培养耗材库', model: 'T25 / T75 / T175 · 皿 · 板 · 管', status: '供应正常', statusType: 'good' },
-          { name: '75% 酒精调配与发放', model: '配制 · 分装 · 补给', status: '补给及时', statusType: 'good' }
-        ],
-        memo: '细胞培养瓶与孔板库存正常；75% 酒精已补充到位，请各工位自取后及时加盖避免挥发。',
-      },
-      M11: {
-        name: 'Y.S.Y', domain: '公共 Buffer', roleTitle: '公共生化缓冲液配制主管',
-        fixedContent: '订购、配制公用 buffer（running buffer, TAE, TBST 等）',
-        fixedDetails: '负责配制 10x Running Buffer、50x TAE、10x TBST、PBS 等公共实验常用基础母液。',
-        assets: [
-          { name: '公共 Buffer 母液库', model: 'Running / TAE / TBST / PBS', status: '母液充足', statusType: 'good' },
-          { name: 'Buffer 配制记录台账', model: '配制日期 · 批次记录', status: '周更新', statusType: 'good' }
-        ],
-        memo: 'TAE 与 TBST 母液已配制并贴标；请取用后拧紧瓶盖，母液剩余不足三分之一时请告知我补配。',
-      }
+      M01: { name: 'H.W.Y', fixedContent: '订购、管理公用分子试剂', fixedItems: [] },
+      M02: { name: 'X.Z',   fixedContent: '日常报销、实验室公账管理', fixedItems: [] },
+      M03: { name: 'L.L.Q', fixedContent: '订购、管理动物实验公共试剂药品', fixedItems: [] },
+      M04: { name: 'Y.J.X', fixedContent: '清理空瓶、锐器盒、门外垃圾桶并按学校通知定期回收', fixedItems: [] },
+      M05: { name: 'G.R.Q', fixedContent: '机动项目，如仪器维修、仪器购买和资产入账等', fixedItems: [] },
+      M06: { name: 'G.R',   fixedContent: '订购、管理公用流式抗体、细胞因子', fixedItems: [] },
+      M07: { name: 'Z.Y.H', fixedContent: '实验室网络资源管理及维护', fixedItems: [] },
+      M08: { name: 'L.Y.Y', fixedContent: '订购、管理公用血清、培养基', fixedItems: [] },
+      M09: { name: 'Z.L.D', fixedContent: '订购、管理二氧化碳/氮气气瓶和液氮补充', fixedItems: [] },
+      M10: { name: 'J.Y',   fixedContent: '订购、管理（T25, T75, T175, 10cm皿, 6孔板, 12孔板, 加样槽, 15ml管, 50ml管, 细胞冻存管, 75%酒精等）',
+             fixedItems: ['T25', 'T75', 'T175', '10cm皿', '6孔板', '12孔板', '加样槽', '15ml管', '50ml管', '细胞冻存管', '75%酒精等'] },
+      M11: { name: 'Y.S.Y', fixedContent: '订购、配制公用 buffer（running buffer, TAE, TBST 等）',
+             fixedItems: ['running buffer', 'TAE', 'TBST 等'] }
     };
 
     /* ─────────────────────────────────────────────────────────────
@@ -1829,7 +1677,7 @@
           <div class="member-nav-avatar">${esc(m.name.charAt(0))}</div>
           <div>
             <div class="member-name-main">${esc(m.name)}${badge}</div>
-            <div class="member-role-sub">岗位 #${slotId + 1} · ${esc(slot.short)}</div>
+            <div class="member-role-sub">岗位 #${slotId + 1} · ${esc(slot.navTag)}</div>
           </div>
         `;
         box.appendChild(card);
@@ -1853,9 +1701,16 @@
       }
     }
 
-    // 岗位的紧凑标签（用于顶栏胶囊等窄空间）
+    // 岗位的紧凑标签（仅用于窄空间展示，取自律约表值日内容的简称）
     function navTagForSlot(slot) {
-      return slot.group.replace(/组$/, '').replace('抽湿机日常维护', '抽湿机维护');
+      return slot.navTag;
+    }
+
+    // 岗位规程的来源说明：有记载则标明出处，无记载则如实标注
+    function sopScopeText(slot) {
+      return slot.sop.length
+        ? `规约表〈${slot.sopSource}〉共 ${slot.sop.length} 项`
+        : '规约表未对该岗位单列细分清单';
     }
 
     function renderCycleToolbar() {
@@ -1912,11 +1767,11 @@
                 ${esc(MEMBERS[id].name)}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
               </span>
-              <span class="shift-scope-tag">${esc(slot.focus)}</span>
+              <span class="shift-scope-tag">当值 ${slot.teamSize} 人</span>
             </div>
 
-            <div class="slot-duty-title" style="margin-top: var(--space-3);">${esc(slot.short)}</div>
-            <p class="slot-desc">${esc(slot.desc)}</p>
+            <div class="slot-duty-title" style="margin-top: var(--space-3);">${esc(slot.title)}</div>
+            <p class="slot-desc">${esc(sopScopeText(slot))}</p>
           </div>
 
           <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border-soft);">
@@ -1942,13 +1797,12 @@
         const tr = document.createElement('tr');
         if (slot.id === 9) tr.className = 'is-current';
         tr.innerHTML = `
-          <td><span class="num">#${slot.id + 1}</span> <span class="meta">${esc(slot.group)}</span></td>
+          <td><span class="num">#${slot.id + 1}</span></td>
           <td>${esc(slot.title)}</td>
           <td><span class="freq-chip ${freqChipClass(slot.freqType)}">${esc(slot.freqCn)}</span></td>
           <td><button class="link-jump-duty" onclick="selectMemberAndOpenDuty('${id}')">${esc(MEMBERS[id].name)}</button></td>
           <td><button class="link-jump-duty" onclick="selectMemberAndOpenDuty('${nextId}')">${esc(MEMBERS[nextId].name)}</button></td>
           <td class="meta">${mates.length ? esc(mates.join('、')) : '—'}</td>
-          <td class="meta">${esc(slot.focus)}</td>
           <td>
             <button class="btn btn-secondary btn-pill-compact" onclick="selectMemberAndOpenDuty('${id}')">查看 Duty</button>
           </td>
@@ -1981,68 +1835,91 @@
       // Hero
       document.getElementById('duty-avatar-box').textContent = data.name.charAt(0);
       document.getElementById('duty-name-display').textContent = data.name;
-      document.getElementById('duty-role-title').textContent = `${data.domain} · ${data.roleTitle}`;
+      document.getElementById('duty-role-title').textContent = `固定分工：${data.fixedContent}`;
 
       const badge = document.getElementById('duty-status-badge');
       badge.textContent = status.text;
       badge.className = `profile-status-badge ${status.cls}`;
 
-      document.getElementById('duty-fixed-meta').textContent = data.domain;
-      document.getElementById('duty-slot-meta').textContent = slot.short;
+      document.getElementById('duty-slot-meta').textContent = slot.title;
       document.getElementById('duty-freq-meta').textContent = slot.freqCn;
-      document.getElementById('duty-next-meta').textContent = `#${nextSlotId + 1} ${nextSlot.short}`;
+      document.getElementById('duty-team-meta').textContent = `${slot.teamSize} 人`;
+      document.getElementById('duty-next-meta').textContent = `#${nextSlotId + 1} ${nextSlot.title}`;
 
-      // 职责标签
+      // 标签：全部取自律约表原文，或对原文的可核对换算，不含规约表以外的描述
       const certs = document.getElementById('duty-certs-container');
       certs.innerHTML = '';
-      [data.domain, slot.freqCn, slot.group, '周一 / 周四库存盘点', currentCycleOffset < 0 ? '筹备期' : `第 ${currentCycleOffset + 1} 周期在岗`]
-        .forEach(t => {
-          const s = document.createElement('span');
-          s.className = 'cert-chip';
-          s.textContent = t;
-          certs.appendChild(s);
-        });
+      [
+        `值日频次 ${slot.freqCn}`,
+        `当值 ${slot.teamSize} 人`,
+        slot.sopSource ? `规程引自〈${slot.sopSource}〉` : '规约表未单列细分清单',
+        '检查库存每周 2 次（Mon / Thu）',
+        currentCycleOffset < 0 ? '筹备期' : `第 ${currentCycleOffset + 1} 周期在岗`
+      ].forEach(t => {
+        const s = document.createElement('span');
+        s.className = 'cert-chip';
+        s.textContent = t;
+        certs.appendChild(s);
+      });
 
-      // SOP（随岗位轮转）
-      document.getElementById('duty-sop-count').textContent = `${slot.sop.length} 项核心专责规程`;
+      // 值日专责规程：逐字引用规约表〈区域打扫内容〉；规约表未记载的岗位如实标注
       const sopList = document.getElementById('duty-sop-list');
       sopList.innerHTML = '';
-      slot.sop.forEach(s => {
+      if (slot.sop.length) {
+        document.getElementById('duty-sop-count').textContent = `${slot.sop.length} 项`;
+        slot.sop.forEach((step, i) => {
+          const item = document.createElement('div');
+          item.className = 'sop-item';
+          item.innerHTML = `
+            <div class="sop-header">
+              <span class="sop-title">${esc(step)}</span>
+              <span class="sop-tag">〈${esc(slot.sopSource)}〉第 ${i + 1} 项</span>
+            </div>
+          `;
+          sopList.appendChild(item);
+        });
+      } else {
+        document.getElementById('duty-sop-count').textContent = '规约表未定义';
         const item = document.createElement('div');
         item.className = 'sop-item';
         item.innerHTML = `
           <div class="sop-header">
-            <span class="sop-title">${esc(s.title)}</span>
-            <span class="sop-tag">${esc(s.tag)}</span>
+            <span class="sop-title">${esc(slot.title)}</span>
+            <span class="sop-tag">〈值日 roster〉值日内容</span>
           </div>
-          <p class="sop-desc">${esc(s.desc)}</p>
-          <div class="sop-spec">执行规范：${esc(s.spec)}</div>
+          <p class="sop-desc">原始规约表未对该岗位单列细分清单，按上表「值日内容」与频次执行。</p>
         `;
         sopList.appendChild(item);
-      });
+      }
 
-      // 固定责任区与专管物资（常态化分工）
-      document.getElementById('duty-inst-count').textContent = `${data.assets.length} 项责任区`;
+      // 固定责任人分工：逐字引用规约表「责任内容」栏
       const instList = document.getElementById('duty-instruments-list');
       instList.innerHTML = '';
-      data.assets.forEach(a => {
-        const d = document.createElement('div');
-        d.className = 'instrument-card-item';
-        d.innerHTML = `
-          <div>
-            <div class="inst-name">${esc(a.name)}</div>
-            <div class="inst-model">${esc(a.model)}</div>
-          </div>
-          <span class="inst-status-tag ${a.statusType === 'good' ? 'inst-good' : 'inst-warn'}">${esc(a.status)}</span>
-        `;
-        instList.appendChild(d);
-      });
+      document.getElementById('duty-inst-count').textContent =
+        data.fixedItems.length ? `${data.fixedItems.length} 项枚举` : '1 条';
 
-      // 备注：固定职责说明 + 交接备忘
-      document.getElementById('duty-personal-memo-box').innerHTML = `
-        <strong>固定职责说明：</strong>${esc(data.fixedDetails)}<br/>
-        <strong>交接备忘摘录：</strong>${esc(data.memo)}
+      const srcRow = document.createElement('div');
+      srcRow.className = 'instrument-card-item';
+      srcRow.innerHTML = `
+        <div>
+          <div class="inst-name">${esc(data.fixedContent)}</div>
+          <div class="inst-model">规约表「责任内容」栏原文</div>
+        </div>
       `;
+      instList.appendChild(srcRow);
+
+      // 原文以括号枚举的成员，另按枚举项逐项列出（内容仍为原文）
+      if (data.fixedItems.length) {
+        const chips = document.createElement('div');
+        chips.style.cssText = 'padding: var(--space-3) var(--space-4); display: flex; flex-wrap: wrap; gap: 6px;';
+        data.fixedItems.forEach(it => {
+          const c = document.createElement('span');
+          c.className = 'cert-chip';
+          c.textContent = it;
+          chips.appendChild(c);
+        });
+        instList.appendChild(chips);
+      }
 
       // 11 期轮转时间轴
       const tl = document.getElementById('duty-timeline-steps');
@@ -2057,10 +1934,10 @@
         el.innerHTML = `
           <div>
             <span class="step-badge">${isCurrent ? '本周期在岗' : `第 ${off + 1} 周期`} · 岗位 #${sId + 1}</span>
-            <div class="step-date">${esc(s.short)}</div>
-            <p class="step-remark">${esc(getCycleDateRange(off))}<br/>频次：${esc(s.freqCn)} · 焦点：${esc(s.focus)}</p>
+            <div class="step-date">${esc(s.title)}</div>
+            <p class="step-remark">${esc(getCycleDateRange(off))}<br/>频次：${esc(s.freqCn)} · 当值 ${s.teamSize} 人</p>
           </div>
-          ${isCurrent ? '<div style="margin-top: 8px; font-size: 10px; font-weight: 600; color: var(--accent);">● 当前焦点节点</div>' : ''}
+          ${isCurrent ? '<div style="margin-top: 8px; font-size: 10px; font-weight: 600; color: var(--accent);">● 当前周期</div>' : ''}
         `;
         tl.appendChild(el);
       }
